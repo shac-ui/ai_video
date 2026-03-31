@@ -1,0 +1,861 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>H5playerVue</title>
+  <link rel="stylesheet" href="./static/css/antd.min.css">
+  <style>
+    body {
+      padding: 8px 8px 32px;
+    }
+    #app {
+      display: none;
+    }
+
+    .actions {
+      padding-left: 8px;
+    }
+
+    .ant-form-item {
+      margin-bottom: 8px
+    }
+    .ant-btn {
+      margin-right: 2px;
+    }
+
+    .icon-wrapper {
+      position: relative;
+      padding-left: 20px;
+    }
+    .icon-wrapper .anticon {
+      position: absolute;
+      top: -2px;
+      width: 16px;
+      height: 16px;
+      line-height: 1;
+      font-size: 16px;
+      left: 0;
+    }
+
+    ::-webkit-media-controls {
+      display: none !important;
+    }
+
+    @media screen and (max-width: 991px) {
+      #player {
+        width: calc(100vw - 16px);
+        height: calc((100vw - 16px) * 5 / 8);
+      }
+    }
+    @media screen and (min-width: 992px) {
+      #player {
+        width: calc(50vw - 8px);
+        height: calc((50vw - 8px) * 5 / 8);
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <a-locale-provider :locale="zh_CN">
+      <a-row>
+        <a-col :span="24" :md="12">
+          <a-affix :offset-top="8">
+            <div id="player"></div>
+          </a-affix>
+          <a-form-item>
+            分屏
+            <a-radio-group v-model="splitNum" @change="arrangeWindow">
+              <a-radio-button :value="1">1x1</a-radio-button>
+              <a-radio-button :value="2">2x2</a-radio-button>
+              <a-radio-button :value="3" v-show="!isMoveDevice">3x3</a-radio-button>
+              <a-radio-button :value="4" v-show="!isMoveDevice">4x4</a-radio-button>
+            </a-radio-group>
+            <a-button @click="wholeFullScreen" >整体全屏</a-button>
+            <a-button @click="singleFullScreen">单窗口全屏</a-button>
+          </a-form-item>
+        </a-col>
+        <a-col :span="24" :md="12">
+          <div class="actions">
+            <a-tabs v-model="tabActive">
+              <a-tab-pane key="mse" tab="普通模式" :disabled="!mseSupport"></a-tab-pane>
+              <a-tab-pane key="decoder" tab="高级模式"></a-tab-pane>
+              <!-- <a-tab-pane key="log" tab="日志"></a-tab-pane> -->
+            </a-tabs>
+            <a-form-item>声明:1、回放优化功能:缩略图、高倍数回放、正倒放切换需要更新至vnsc1.16.101+、mgc5.16.101+、dac1.15.102+、vod5.15.100+、sac1.8.100+、ncg5.15.101+。2、普通模式的单帧和电子放大功能仅在https环境&chrome94+下生效</a-form-item>
+            <a-form :label-col="labelCol" :wrapper-col="wrapperCol" v-show="tabActive !== 'log'">
+              <a-form-item label="预览URL">
+                <a-input v-model="urls.realplay"></a-input>
+              </a-form-item>
+              <a-form-item label="对讲URL">
+                <a-input v-model="urls.talk"></a-input>
+              </a-form-item>
+              <a-form-item label="预览&对讲">
+                <a-button id="btn-realplay" @click="realplay">开始预览</a-button>
+                <a-button id="btn-realplay-stop" @click="stopPlay">停止预览</a-button>
+                <a-button id="btn-talk-start" @click="talkStart">开始对讲</a-button>
+                <a-button id="btn-talk-stop" @click="talkStop">停止对讲</a-button>
+                <a-button id="btn-stopall" @click="stopAllPlay">停止全部窗口</a-button>
+              </a-form-item>
+              <a-form-item label="即时回放(预览功能)">
+                <a-button id="btn-instant-open" @click="OpenInstant">开启即时回放</a-button>
+                <select v-model="InstantParam">
+                  <option value="10">10</option>
+                  <option value="20">20</option>
+                  <option value="30">30</option>
+                </select>
+                <a-button id="btn-instant-start" @click="StartInstant">开始即时回放</a-button>
+                <a-button id="btn-instant-stop" @click="StopInstant">停止即时回放</a-button>
+                <a-button id="btn-instant-totaltime" @click="InstantTatolduration">总时长</a-button>
+                <a-button id="btn-instant-currtime" @click="InstantCurrduration">当前播放时长</a-button>
+              </a-form-item>
+              <a-form-item label="回放URL">
+                <a-input v-model="urls.playback"></a-input>
+                <br>
+                <a-date-picker show-time placeholder="开始时间" format="YYYY-MM-DD HH:mm:ss"
+                  v-model="playback.startTime" :value-format="playback.valueFormat">
+                </a-date-picker>
+                <a-date-picker show-time placeholder="结束时间" format="YYYY-MM-DD HH:mm:ss"
+                  v-model="playback.endTime" :value-format="playback.valueFormat">
+                </a-date-picker>
+              </a-form-item>
+              <a-form-item label="回放">
+                <a-button id="btn-playback" @click="playbackStart">开始回放</a-button>
+                <a-button id="btn-reverse" @click="reversekStart">开始倒放</a-button>
+                <a-button id="btn-changemode" @click="ChangeMode">正倒放切换</a-button>
+                <a-button id="btn-playback-pause" @click="playbackPause">暂停</a-button>
+                <a-button id="btn-playback-resume" @click="playbackResume">恢复</a-button>
+                <a-button id="btn-playback-stop" @click="stopPlay">停止回放</a-button>
+                <a-button id="btn-playback-slow" @click="playbackSlow">慢放</a-button>
+                <a-button id="btn-playback-fast" @click="playbackFast">快放</a-button>
+                <br>
+                <a-row>
+                  <a-col :span="16">
+                    <a-button id="btn-playback-one" @click="frameBack" >单帧退</a-button>
+                    <a-button id="btn-playback-one-reverse" @click="resumeReverse" >单帧倒向恢复</a-button>
+                    <a-button id="btn-playback-one-forward" @click="resumeforward" >单帧正向恢复</a-button>
+                    <a-button id="btn-playback-one" @click="frameForward" >单帧进</a-button>
+                    <br>
+                    <a-date-picker show-time placeholder="开始时间" format="YYYY-MM-DD HH:mm:ss"
+                      v-model="playback.seekStart"
+                      :value-format="playback.valueFormat">
+                    </a-date-picker>
+                    &nbsp;<a-button @click="seekTo">定位</a-button>
+                  </a-col>
+                  <a-col :span="8">
+                    <a-statistic title="当前播放速度" :value="playback.rate"></a-statistic>
+                  </a-col>
+                </a-row>
+              </a-form-item>
+
+              <a-form-item label="声音">
+                <a-row>
+                  <a-col :span="10">
+                    <a-button id="btn-sound-open" @click="openSound">开启</a-button>
+                    <a-button id="btn-sound-close" @click="closeSound">关闭</a-button>
+                  </a-col>
+                  <a-col :span="12">
+                    <div class="icon-wrapper">
+                      <a-icon v-if="muted" :component="volumeOffSvg"></a-icon>
+                      <a-icon v-else :component="volumeOnSvg"></a-icon>
+                      <a-slider v-model="volume" :default-value="50" :disabled="muted" @change="setVolume"></a-slider>
+                    </div>
+                  </a-col>
+                </a-row>
+              </a-form-item>
+              
+              <a-form-item label="抓图&录像">
+                <a-button id="btn-capture-jpeg" @click="capture('JPEG')">抓图</a-button>
+                <br>
+                <a-button id="btn-record-mp4" @click="recordStart('MP4')">录制MP4</a-button>
+                <a-button id="btn-record-ps" @click="recordStart('PS')">录制PS</a-button>
+                <a-button id="btn-record-save" @click="recordStop">停止录制并保存文件</a-button>
+                <br>
+                <a-button id="btn-record-audio" @click="recordStartTalk">录制音频</a-button>
+                <a-button id="btn-record-audio" @click="recordStopTalk">停止录制音频</a-button>
+                <a-input v-model="audioType" style="width: unset;"></a-input>
+              </a-form-item>
+
+              <a-form-item label="视频信息&OSD时间">
+                <a-button id="btn-video-info" @click="getvideoInfo">获取视频信息</a-button>
+                <a-button id="btn-ose-time" @click="getOSDTime">获取OSD时间</a-button>
+              </a-form-item>
+              
+              <a-form-item label="电子放大" >
+                <a-button id="btn-enlarge-open" @click="enlarge">开启电子放大</a-button>
+                <a-button id="btn-enlarge-close" @click="enlargeClose">关闭电子放大</a-button>
+              </a-form-item>
+              <a-form-item label="智能信息">
+                <a-button id="btn-intellect-open" @click="intellectTrigger(true)">开启智能信息</a-button>
+                <a-button id="btn-intellect-close" @click="intellectTrigger(false)">关闭智能信息</a-button>
+              </a-form-item>
+              <a-form-item label="缩略图">
+                <a-button id="btn-Thumbnails-open" @click="ThumbnailsOpen">开启缩略图</a-button>
+                <a-button id="btn-Thumbnails-Get" @click="ThumbnailsGet">获取缩略图</a-button>
+                <a-button id="btn-Thumbnails-close" @click="ThumbnailsClose">关闭缩略图</a-button>
+                <a-input v-model="ThumbnailsTime" style="width: unset;"></a-input>
+              </a-form-item>
+              <a-form-item label="直接倍数回放" >
+                <a-button id="btn-speed" @click="Speed">倍数</a-button>
+                <select v-model="rate">
+                  <option value="-8">-8</option>
+                  <option value="-4">-4</option>
+                  <option value="-2">-2</option>
+                  <option value="1">1</option>
+                  <option value="2">2</option>
+                  <option value="4">4</option>
+                  <option value="8">8</option>
+                  <option value="16">16</option>
+                  <option value="32">32</option>
+                  <option value="64">64</option>
+                </select>
+              </a-form-item>
+              <a-form-item label="是否支持回放优化" >
+                <a-button id="btn-judgeUrl" @click="judgeUrl">判断</a-button>
+                <a-input v-model="judgeurlname" style="width: unset;"></a-input>
+              </a-form-item>
+
+              <a-form-item label="旋转&缩放">
+                <a-select v-model="zoom.rotate" style="width: 120px;" type="number" @change="rotate">
+                  <a-select-option :value="0">0&deg</a-select-option>
+                  <a-select-option :value="90">90&deg</a-select-option>
+                  <a-select-option :value="180">180&deg</a-select-option>
+                  <a-select-option :value="270">270&deg</a-select-option>
+                </a-select>
+                <a-select v-model="zoom.ratio" style="width: 120px;" @change="scale">
+                  <a-select-option value="fill">平铺</a-select-option>
+                  <a-select-option value="16:9">16:9</a-select-option>
+                  <a-select-option value="4:3">4:3</a-select-option>
+                  <a-select-option value="9:16">9:16</a-select-option>
+                  <a-select-option value="3:4">3:4</a-select-option>
+                </a-select>
+                <a-button @click="scaleCancel">还原</a-button>
+              </a-form-item>
+              
+              <a-form-item label="抓图水印">
+                <a-form layout="inline">
+                  <a-form-item label="内容"><a-input v-model="watermarkConfig.text"></a-input></a-form-item>
+                  <a-form-item label="间隔"><a-input v-model="watermarkConfig.space" type="number" suffix="px" style="width: 100px;"></a-input></a-form-item>
+                  <a-form-item label="角度"><a-input v-model="watermarkConfig.rotateDegree" type="number" suffix="&deg"  style="width: 100px;"></a-input></a-form-item>
+                  <a-form-item label="字体"><a-input v-model="watermarkConfig.font"></a-input></a-form-item>
+                  <a-form-item label="颜色"><a-input v-model="watermarkConfig.color"></a-input></a-form-item>
+                </a-form>
+                <a-button id="btn-watermark-set" @click="setWatermark">设置</a-button>
+                <a-button id="btn-watermark-cancel" @click="cancelWatermark">清除</a-button>
+              </a-form-item>
+            </a-form>
+          </div>
+        </a-col>
+      </a-row>
+    </a-locale-provider>
+  </div>
+  
+  <template id="play-log">
+    <div></div>
+  </template>
+  
+  <!-- 移动端调试 -->
+  <script src="./static/js/vconsole.min.js"></script>
+  <!-- <script>
+      if (IS_MOVE_DEVICE) {
+        const vc = new VConsole()
+      }
+  </script> -->
+  
+  <script src="./static/js/moment.js"></script>
+  <script src="./static/js/vue.js"></script>
+  <script src="./static/js/antd.min.js"></script>
+  <script src="./static/js/antd-with-locales.min.js"></script>
+  <script src="./h5player.min.js"></script>
+  <script>
+    const { LocaleProvider, locales } = window.antd
+    moment.locale('./static/js/zh-cn.js')
+
+    const IS_MOVE_DEVICE = document.body.clientWidth < 992 // 是否移动设备
+    const MSE_IS_SUPPORT = !!window.MediaSource // 是否支持mse
+
+    if (IS_MOVE_DEVICE) {
+        const vc = new VConsole()
+      }
+
+    // function streamcb(data) {
+    //   console.log(data);
+    // }
+
+    const app = new Vue({
+      el: '#app',
+      // components: { Log },
+      data() {
+        return {
+          zh_CN: locales.zh_CN,
+          isMoveDevice: IS_MOVE_DEVICE,
+          player: null,
+          splitNum: IS_MOVE_DEVICE ? 1 : 2,
+          mseSupport: MSE_IS_SUPPORT,
+          tabActive: MSE_IS_SUPPORT ? 'mse' : 'decoder',
+          labelCol: { span: 5 },
+          wrapperCol: { span: 18 },
+          urls: {
+
+            realplay: 'wss://10.19.147.57:6014/proxy/10.19.147.57:559/EUrl/KjuVUic',
+            talk: 'wss://10.19.147.57:6014/proxy/10.19.147.57:559/EUrl/KjuVUic',
+            playback: 'wss://10.19.147.57:6014/proxy/10.19.147.57:559/EUrl/KjuVUic'
+          },
+          playback: {
+            startTime: '2023-08-16T00:00:00',
+            endTime: '2023-08-16T23:00:00',
+            valueFormat: moment.HTML5_FMT.DATETIME_LOCAL_SECONDS,
+            seekStart: '2023-08-16T10:00:00',
+            rate: ''
+          },
+          SmoothDragTime:'2023-08-16T07:47:36.000+08:00',
+          ThumbnailsTime:'2023-08-16T07:47:36.000+08:00',
+          judgeurlname:'wss://10.19.147.57:6014/proxy/10.19.147.57:559/EUrl/KjuVUic',
+          rate: 1,
+          audioType:2,
+          muted: true,
+          volume: 50,
+          InstantParam: 10,
+          token:"",
+          volumeOnSvg: {
+            template: '<svg t="1624453273744" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="1421" width="200" height="200"><path d="M597.994667 138.005333q130.005333 28.010667 213.994667 132.992t84.010667 241.002667-84.010667 241.002667-213.994667 132.992l0-88q93.994667-28.010667 153.002667-106.005333t59.008-180.010667-59.008-180.010667-153.002667-106.005333l0-88zM704 512q0 120-106.005333 172.010667l0-344q106.005333 52.010667 106.005333 172.010667zM128 384l170.005333 0 213.994667-213.994667 0 684.010667-213.994667-213.994667-170.005333 0 0-256z" p-id="1422"></path></svg>'
+          },
+          volumeOffSvg: {
+            template: '<svg t="1624453193279" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="9147" width="200" height="200"><path d="M512 170.005333l0 180.010667-90.005333-90.005333zM181.994667 128l714.005333 714.005333-53.994667 53.994667-88-88q-74.005333 58.005333-156.010667 77.994667l0-88q50.005333-13.994667 96-50.005333l-181.994667-181.994667 0 288-213.994667-213.994667-170.005333 0 0-256 202.005333 0-202.005333-202.005333zM810.005333 512q0-101.994667-59.008-180.010667t-153.002667-106.005333l0-88q130.005333 28.010667 213.994667 132.992t84.010667 241.002667q0 96-44.010667 178.005333l-64-66.005333q21.994667-53.994667 21.994667-112zM704 512q0 18.005333-2.005333 26.005333l-104-104 0-93.994667q106.005333 52.010667 106.005333 172.010667z" p-id="9148"></path></svg>'
+          },
+
+          zoom: {
+            rotate: 0,
+            ratio: 'fill'
+          },
+          watermarkConfig: {
+            text: 'h5player',
+            color: 'rgba(255, 255, 255, 0.5)',
+            font: '24px 微软雅黑',
+            rotateDegree: -15,
+            space: 240
+          }
+        }
+      },
+      computed: {
+        mode: function() {
+          return this.tabActive === 'mse' ? 0 : 1
+        }
+      },
+      methods: {
+        init() {
+          // 设置播放容器的宽高并监听窗口大小变化
+          window.addEventListener('resize', () => {
+            this.player.JS_Resize()
+          })
+        },
+        createPlayer() {
+          this.player = new JSPlugin({
+            szId: 'player',//父窗口id，需要英文字母开头 必填
+            szBasePath: "./",// 必填,与h5player.min.js的引用路径一致
+            iMaxSplit: 4,
+            iCurrentSplit: IS_MOVE_DEVICE ? 1 : 2,
+            openDebug: true,
+            mseWorkerEnable: false,//是否开启多线程解码，分辨率大于1080P建议开启，否则可能卡顿
+			      bSupporDoubleClickFull: true,//是否支持双击全屏，true-双击是全屏；false-双击无响应
+            oStyle: {
+              borderSelect: IS_MOVE_DEVICE ? '#000' : '#FFCC00',
+            }
+          })
+
+          // 事件回调绑定
+          this.player.JS_SetWindowControlCallback({
+            windowEventSelect: function (iWndIndex) {  //插件选中窗口回调
+                console.log('windowSelect callback: ', iWndIndex);
+            },
+            pluginErrorHandler: function (iWndIndex, iErrorCode, oError) {  //插件错误回调
+                console.log('pluginError callback: ', iWndIndex, iErrorCode, oError);
+            },
+            windowEventOver: function (iWndIndex) {  //鼠标移过回调
+                //console.log(iWndIndex);
+            },
+            windowEventOut: function (iWndIndex) {  //鼠标移出回调
+                //console.log(iWndIndex);
+            },
+            windowEventUp: function (iWndIndex) {  //鼠标mouseup事件回调
+                //console.log(iWndIndex);
+            },
+            windowFullCcreenChange: function (bFull) {  //全屏切换回调
+                console.log('fullScreen callback: ', bFull);
+            },
+            firstFrameDisplay: function (iWndIndex, iWidth, iHeight) {  //首帧显示回调
+                console.log('firstFrame loaded callback: ', iWndIndex, iWidth, iHeight);
+            },
+            performanceLack: function (iWndIndex) {  //性能不足回调
+                console.log('performanceLack callback: ', iWndIndex);
+            },
+            StreamEnd: function (iWndIndex) {  //性能不足回调
+                console.log('recv StreamEnd: ',iWndIndex);
+            },
+            StreamHeadChanged: function (iWndIndex) {
+              console.log('recv StreamHeadChanged: ',iWndIndex);
+            },
+            ThumbnailsEvent: (iWndIndex, eventType, eventCode) => {
+              console.log('recv ThumbnailsEvent: '+iWndIndex+", eventType:"+eventType+", eventCode:"+eventCode);
+            },
+            InterruptStream: (iWndIndex, iTime) => {
+              console.log('recv InterruptStream: '+iWndIndex+", iTime:"+iTime);
+            },
+            ElementChanged: (iWndIndex, szElementType) => {//回调采用的是video还是canvas
+              console.log('recv ElementChanged: '+iWndIndex+", szElementType:"+szElementType);
+            },
+        });
+        },
+        arrangeWindow() {
+          let splitNum = this.splitNum
+          this.player.JS_ArrangeWindow(splitNum).then(
+            () => { console.log(`arrangeWindow to ${splitNum}x${splitNum} success`) },
+            e => { console.error(e) }
+          )
+        },
+        wholeFullScreen() {
+          this.player.JS_FullScreenDisplay(true).then(
+            () => { console.log(`wholeFullScreen success`) },
+            e => { console.error(e) }
+          )
+        },
+        singleFullScreen() {
+          this.player.JS_FullScreenSingle(this.player.currentWindowIndex).then(
+            () => { console.log(`singleFullScreen success`) },
+            e => { console.error(e) }
+          )
+        },
+        /* 预览&对讲 */
+        realplay() {
+          let { player, mode, urls, token} = this,
+            index = player.currentWindowIndex,
+            playURL = urls.realplay
+          player.JS_SetTraceId(index, true)
+          player.JS_Play(playURL, { playURL, mode, keepDecoder:0, token}, index).then(
+            () => { 
+              console.log('realplay success');
+              player.JS_GetTraceId(index).then((id) => {console.log("traceid:",id)})},
+            e => { console.error(e) }
+          )
+        },
+        stopPlay() {
+          this.player.JS_Stop().then(
+            () => { this.playback.rate = 0; console.log('stop realplay success') },
+            e => { console.error(e) }
+          )
+        },
+        talkStart() {
+          let url = this.urls.talk
+          this.player.JS_StartTalk(url, {token:this.token}).then(
+            () => { console.log('talkStart success') },
+            e => { console.error(e) }
+          )
+        },
+        talkStop() {
+          this.player.JS_StopTalk().then(
+            () => { console.log('talkStop success') },
+            e => { console.error(e) }
+          )
+        },
+        stopAllPlay() {
+          this.player.JS_StopRealPlayAll().then(
+            () => {  this.playback.rate = 0; console.log('stopAllPlay success') },
+            e => { console.error(e) }
+          )
+        },
+        /* 回放 */
+        playbackStart() {
+          let { player, mode, urls, playback, token} = this,
+            index = player.currentWindowIndex,
+            playURL = urls.playback,
+            { startTime, endTime } = playback
+            startTime = startTime +".000+08:00";
+            endTime = endTime + ".000+08:00";
+          player.JS_Play(playURL, { playURL, mode, keepDecoder:0, token}, index, startTime, endTime).then(
+            () => {
+              console.log('playbackStart success')
+              this.playback.rate = 1
+            },
+            e => { console.error(e) }
+          )
+        },
+
+        //   /* 倒放 */
+          reversekStart() {
+          let { player, mode, urls, playback, token } = this,
+            index = player.currentWindowIndex,
+            playURL = urls.playback,
+            { startTime, endTime } = playback
+
+            startTime = startTime +".000+08:00";
+            endTime = endTime + ".000+08:00";
+          player.JS_Play(playURL, { playURL, mode, keepDecoder:0, PlayBackMode:3, token}, index, startTime, endTime).then(
+            () => {
+              console.log('reversekStart success')
+              this.playback.rate = 1
+            },
+            e => { console.error(e) }
+          )
+        },
+        playbackPause() {
+          this.player.JS_Pause(this.player.currentWindowIndex).then(
+            () => { console.log('playbackPause success') },
+            e => { console.error(e) }
+          )
+        },
+        playbackResume() {
+          this.player.JS_Resume(this.player.currentWindowIndex).then(
+            () => { console.log('playbackResume success') },
+            e => { console.error(e) }
+          )
+        },
+        seekTo() {
+          let { seekStart, endTime } = this.playback
+          seekStart = seekStart +".000+08:00";
+          endTime = endTime + ".000+08:00";
+          this.player.JS_Seek(this.player.currentWindowIndex, seekStart, endTime).then(
+            () => { console.log('seekTo success') },
+            e => { console.error(e) }
+          )
+        },
+        playbackSlow() {
+          this.player.JS_Slow().then(
+            rate => {
+              this.playback.rate = rate
+              console.log("Slow success, current rate", rate);
+            },
+            e => { console.error(e) }
+          )
+        },
+        playbackFast() {
+          this.player.JS_Fast().then(
+            rate => {
+              this.playback.rate = rate
+              console.log("Fast success, current rate", rate);
+            },
+            e => { console.error(e) }
+          )
+        },
+        frameForward() {
+          this.player.JS_FrameForward(this.player.currentWindowIndex).then(
+            () => { this.playback.rate = 1; console.log('frameForward success') },
+            e => { console.error(e) }
+          )
+        },
+        frameBack() {
+          this.player.JS_FrameBack(this.player.currentWindowIndex).then(
+            () => { this.playback.rate = 1; console.log('frameBack success') },
+            e => { console.error(e) }
+          )
+        },
+        resumeReverse() {
+          this.player.JS_Resume(this.player.currentWindowIndex, false).then(
+            () => { console.log('resumeReverse success') },
+            e => { console.error(e) }
+          )
+        },
+        resumeforward() {
+          this.player.JS_Resume(this.player.currentWindowIndex, true).then(
+            () => { console.log('resumeforward success') },
+            e => { console.error(e) }
+          )
+        },
+        /* 声音、抓图、录像 */
+        openSound() {
+          this.player.JS_OpenSound().then(
+            () => {
+              console.log('openSound success')
+              this.muted = false
+            },
+            e => { console.error(e) }
+          )
+        },
+        closeSound() {
+          this.player.JS_CloseSound().then(
+            () => {
+              console.log('closeSound success')
+              this.muted = true
+            },
+            e => { console.error(e) }
+          )
+        },
+        setVolume(value) {
+          let player = this.player,
+            index = player.currentWindowIndex
+          this.player.JS_SetVolume(index, value).then(
+            () => {
+              console.log('setVolume success', value)
+            },
+            e => { console.error(e) }
+          )
+        },
+        capture(imageType) {
+          let player = this.player,
+            index = player.currentWindowIndex
+
+          player.JS_CapturePicture(index, 'img', imageType).then(
+            () => { console.log('capture success', imageType) },
+            e => { console.error(e) }
+          )
+          //player.JS_CapturePicture(index, 'img', imageType, function () { //数据恢复
+          // console.log(arguments, "arguments") 
+          //}
+          //).then(
+          //  () => { console.log('capture success', imageType) },
+           // e => { console.error(e) }
+          //)
+        },
+        streamcb(data) {
+          console.log(data);
+        }, 
+        recordStart(type) {
+          const codeMap = { MP4: 5, PS: 2 }
+          //let options = {irecordType: 2, cbStreamCB: streamcb}
+          let player = this.player,
+            index = player.currentWindowIndex,
+            fileName = `${moment().format('YYYYMMDDHHmmss')}.mp4`
+            typeCode = codeMap[type]
+
+          player.JS_StartSaveEx(index, fileName, typeCode, {irecordType: 1, cbStreamCB: this.streamcb}).then(
+            () => { console.log('record start ...') },
+            e => { console.error(e) }
+          )
+        },
+ 
+        recordStop() {
+          let player = this.player 
+            index = player.currentWindowIndex
+
+          player.JS_StopSave(index).then(
+            () => { console.log('record stoped, saving ...') },
+            e => { console.error(e) }
+          )
+        },
+        /* 电子放大、智能信息 */
+        enlarge() {
+          let player = this.player,
+            index = player.currentWindowIndex
+
+          player.JS_EnableZoom(index).then(
+            () => { console.log('enlarge start..., select range...') },
+            e => { console.error(e) }
+          )
+        },
+        enlargeClose() {
+          let player = this.player,
+            index = player.currentWindowIndex
+
+          player.JS_DisableZoom(index).then(
+            () => { console.log('enlargeClose success') },
+            e => { console.error(e) }
+          )
+        },
+        intellectTrigger(openFlag) {
+          let player = this.player,
+            index = player.currentWindowIndex
+
+          player.JS_RenderALLPrivateData(index,openFlag).then(
+            () => {
+              console.info('JS_RenderALLPrivateData success');
+            },
+            (err) => {
+              console.error('JS_RenderALLPrivateData failed:', err);
+          });
+        },
+        getvideoInfo() {
+          let player = this.player,
+            index = player.currentWindowIndex
+
+          player.JS_GetVideoInfo(index).then(function (videoInfo) {
+            console.log("videoInfo:", videoInfo);
+          });
+        },
+        getOSDTime() {
+          let player = this.player,
+            index = player.currentWindowIndex
+
+          player.JS_GetOSDTime(index).then(function(time) {
+            //console.log("osdTime:", time);
+            let data = new Date(time)
+            console.log("osdTime:"+time+",UTC:"+data);
+          });
+        },
+        jsdecoderVersion() {
+          let v = this.player.JS_GetSdkVersion();
+          console.log("JS_GetSdkVersion:", v);
+          
+        },
+        ThumbnailsOpen() {
+          let { player, mode, urls, playback, token } = this,
+            index = player.currentWindowIndex,
+            playURL = urls.playback,
+            { startTime, endTime } = playback
+
+            startTime = startTime +".000+08:00";
+            endTime = endTime + ".000+08:00";
+          this.player.JS_StartVideoThumbnails(index, playURL, startTime, endTime, {token})
+        },
+        Thumbnailcb(timestamp,dataUrl) {
+          console.log("timestamp:"+timestamp+", binaryData:", dataUrl)
+          // let dataUrl = null
+          // let base64String = ''
+          // let len = binaryData.byteLength
+          // for (let i = 0; i < len; i++) {
+          //     base64String += String.fromCharCode(binaryData[i])
+          // }
+          // let base64Data = btoa(base64String)
+          // dataUrl = `data:image/jpeg;base64,${base64Data}`
+          let ext = dataUrl.split(';').shift().split('/').pop() // 后缀名
+            let mEvent = document.createEvent('MouseEvents')
+            mEvent.initEvent('click', false, false)
+            let aScript = document.createElement('a')
+            aScript.href = dataUrl
+            aScript.download = `imag.jpeg`
+            aScript.dispatchEvent(mEvent)
+        },
+        ThumbnailsGet() {
+          let player = this.player,
+            index = player.currentWindowIndex
+          this.player.JS_GetVideoThumbnails(index, this.ThumbnailsTime, this.Thumbnailcb).then(
+            ()=> {
+              console.log("JS_GetVideoThumbnails success, time:", this.ThumbnailsTime);
+            },
+            e => { console.error("JS_GetVideoThumbnails faild:", e) }
+          )
+        },
+        ThumbnailsClose() {
+          let player = this.player,
+            index = player.currentWindowIndex
+          this.player.JS_StopVideoThumbnails(index);
+        },
+        ChangeMode() {
+          let player = this.player,
+            index = player.currentWindowIndex
+          this.player.JS_ChangeMode(index);
+        },
+        Speed() {
+          let player = this.player,
+            index = player.currentWindowIndex
+          this.player.JS_Speed(index, parseFloat(this.rate)).then(
+            rate => {
+              this.playback.rate = rate
+              console.log("Speed success, current rate", rate);
+            },
+            e => { console.error(e) }
+          )
+        },
+        judgeUrl() {
+          let player = this.player,
+            index = player.currentWindowIndex
+          this.player.JS_OptimizeCapability(index, this.judgeurlname).then(
+            (type) => { console.log('JS_OptimizeCapability success:', type) },
+          )
+        },
+        recordStartTalk(){
+          let fileName = `${moment().format('YYYYMMDDHHmmss')}.mp3`
+          this.player.JS_StartSaveTalk(fileName, parseInt(this.audioType)).then(
+            () => { console.log('JS_StartSaveTalk success') },
+            e => { console.error(e) }
+          )
+        },
+        recordStopTalk(){
+          this.player.JS_StopSaveTalk().then(
+            () => { console.log('JS_StopSaveTalk success') },
+            e => { console.error(e) }
+          )
+        },
+        OpenInstant() {
+          let option = {
+            bOpenflag: true,
+            bInstantTime: parseInt(this.InstantParam)
+          }
+          this.player.JS_InstantSetParam(this.player.currentWindowIndex, option).then(
+            () => { console.log('JS_InstantSetParam success') },
+            e => { console.error(e) }
+          )
+        },
+
+        StartInstant(){
+          this.player.JS_StartInstant(this.player.currentWindowIndex).then(
+            () => { console.log('JS_StartInstant success') },
+            e => { console.error(e) }
+          )
+        },
+        StopInstant(){
+          this.player.JS_StopInstant(this.player.currentWindowIndex).then(
+            () => { console.log('JS_StopInstant success') },
+            e => { console.error(e) }
+          )
+        },
+        InstantTatolduration() {
+          this.player.JS_InstantTotalDuration(this.player.currentWindowIndex).then(
+            (time) => { console.log('JS_InstantTotalDuration:', time) },
+            e => { console.error(e) }
+          )
+        },
+        InstantCurrduration() {
+          this.player.JS_InstantCurrDuration(this.player.currentWindowIndex).then(
+            (time) => { console.log('JS_InstantCurrDuration:', time) },
+            e => { console.error(e) }
+          )
+        },
+      
+        // 旋转、缩放、抓图水印
+        rotate() {
+            this.player.JS_Rotate(this.player.currentWindowIndex, this.zoom.rotate).then(
+              () => { console.log('rotate success') },
+              err => { console.error('rotate failed', err) }
+            )
+          },
+        scale() {
+          this.player.JS_Scale(this.player.currentWindowIndex, this.zoom.ratio).then(
+              () => { console.log('scale success') },
+              err => { console.error('scale failed', err) }
+            )
+        },
+        scaleCancel(){
+          this.player.JS_ScaleCancel(this.player.currentWindowIndex).then(
+            () => {
+              this.zoom.rotate = 0
+              this.zoom.ratio = 'fill'
+            }
+          )
+        },
+        setWatermark() {
+          let cfg = Object.assign({}, this.watermarkConfig)
+          if (cfg.color === '') {
+            delete cfg.color
+          }
+          if (cfg.font === '') {
+            delete cfg.font
+          }
+          if (cfg.rotateDegree === '') {
+            delete cfg.rotateDegree
+          }
+          if (cfg.space === '') {
+            delete cfg.space
+          }
+          if (/^-?[0-9]+$/.test(cfg.rotateDegree)) cfg.rotateDegree = parseInt(cfg.rotateDegree)
+          if (/^-?[0-9]+$/.test(cfg.space)) cfg.space = parseInt(cfg.space)
+          
+          this.player.JS_SetWatermarkConfig(cfg).then(
+              () => { console.log('setWatermark success') },
+              err => { console.error('setWatermark failed', err) }
+            )
+          // player.JS_WatermarkShow()
+        },
+        cancelWatermark() {
+          this.player.JS_CancelWatermarkConfig()
+        },
+      },
+      mounted() {
+        this.$el.style.setProperty('display', 'block')
+        this.init()
+        this.createPlayer()
+      }
+    })
+  </script>
+</body>
+</html>

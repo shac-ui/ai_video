@@ -1,0 +1,2894 @@
+<!DOCTYPE html><html><head>
+      <title>README</title>
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      
+      <link rel="stylesheet" href="file:///c:\Users\zenghuijuan\.vscode\extensions\shd101wyy.markdown-preview-enhanced-0.8.15\crossnote\dependencies\katex\katex.min.css">
+      
+      
+      <script type="text/javascript" src="file:///c:\Users\zenghuijuan\.vscode\extensions\shd101wyy.markdown-preview-enhanced-0.8.15\crossnote\dependencies\mermaid\mermaid.min.js" charset="UTF-8"></script>
+      
+      
+      <style>
+      code[class*=language-],pre[class*=language-]{color:#333;background:0 0;font-family:Consolas,"Liberation Mono",Menlo,Courier,monospace;text-align:left;white-space:pre;word-spacing:normal;word-break:normal;word-wrap:normal;line-height:1.4;-moz-tab-size:8;-o-tab-size:8;tab-size:8;-webkit-hyphens:none;-moz-hyphens:none;-ms-hyphens:none;hyphens:none}pre[class*=language-]{padding:.8em;overflow:auto;border-radius:3px;background:#f5f5f5}:not(pre)>code[class*=language-]{padding:.1em;border-radius:.3em;white-space:normal;background:#f5f5f5}.token.blockquote,.token.comment{color:#969896}.token.cdata{color:#183691}.token.doctype,.token.macro.property,.token.punctuation,.token.variable{color:#333}.token.builtin,.token.important,.token.keyword,.token.operator,.token.rule{color:#a71d5d}.token.attr-value,.token.regex,.token.string,.token.url{color:#183691}.token.atrule,.token.boolean,.token.code,.token.command,.token.constant,.token.entity,.token.number,.token.property,.token.symbol{color:#0086b3}.token.prolog,.token.selector,.token.tag{color:#63a35c}.token.attr-name,.token.class,.token.class-name,.token.function,.token.id,.token.namespace,.token.pseudo-class,.token.pseudo-element,.token.url-reference .token.variable{color:#795da3}.token.entity{cursor:help}.token.title,.token.title .token.punctuation{font-weight:700;color:#1d3e81}.token.list{color:#ed6a43}.token.inserted{background-color:#eaffea;color:#55a532}.token.deleted{background-color:#ffecec;color:#bd2c00}.token.bold{font-weight:700}.token.italic{font-style:italic}.language-json .token.property{color:#183691}.language-markup .token.tag .token.punctuation{color:#333}.language-css .token.function,code.language-css{color:#0086b3}.language-yaml .token.atrule{color:#63a35c}code.language-yaml{color:#183691}.language-ruby .token.function{color:#333}.language-markdown .token.url{color:#795da3}.language-makefile .token.symbol{color:#795da3}.language-makefile .token.variable{color:#183691}.language-makefile .token.builtin{color:#0086b3}.language-bash .token.keyword{color:#0086b3}pre[data-line]{position:relative;padding:1em 0 1em 3em}pre[data-line] .line-highlight-wrapper{position:absolute;top:0;left:0;background-color:transparent;display:block;width:100%}pre[data-line] .line-highlight{position:absolute;left:0;right:0;padding:inherit 0;margin-top:1em;background:hsla(24,20%,50%,.08);background:linear-gradient(to right,hsla(24,20%,50%,.1) 70%,hsla(24,20%,50%,0));pointer-events:none;line-height:inherit;white-space:pre}pre[data-line] .line-highlight:before,pre[data-line] .line-highlight[data-end]:after{content:attr(data-start);position:absolute;top:.4em;left:.6em;min-width:1em;padding:0 .5em;background-color:hsla(24,20%,50%,.4);color:#f4f1ef;font:bold 65%/1.5 sans-serif;text-align:center;vertical-align:.3em;border-radius:999px;text-shadow:none;box-shadow:0 1px #fff}pre[data-line] .line-highlight[data-end]:after{content:attr(data-end);top:auto;bottom:.4em}html body{font-family:'Helvetica Neue',Helvetica,'Segoe UI',Arial,freesans,sans-serif;font-size:16px;line-height:1.6;color:#333;background-color:#fff;overflow:initial;box-sizing:border-box;word-wrap:break-word}html body>:first-child{margin-top:0}html body h1,html body h2,html body h3,html body h4,html body h5,html body h6{line-height:1.2;margin-top:1em;margin-bottom:16px;color:#000}html body h1{font-size:2.25em;font-weight:300;padding-bottom:.3em}html body h2{font-size:1.75em;font-weight:400;padding-bottom:.3em}html body h3{font-size:1.5em;font-weight:500}html body h4{font-size:1.25em;font-weight:600}html body h5{font-size:1.1em;font-weight:600}html body h6{font-size:1em;font-weight:600}html body h1,html body h2,html body h3,html body h4,html body h5{font-weight:600}html body h5{font-size:1em}html body h6{color:#5c5c5c}html body strong{color:#000}html body del{color:#5c5c5c}html body a:not([href]){color:inherit;text-decoration:none}html body a{color:#08c;text-decoration:none}html body a:hover{color:#00a3f5;text-decoration:none}html body img{max-width:100%}html body>p{margin-top:0;margin-bottom:16px;word-wrap:break-word}html body>ol,html body>ul{margin-bottom:16px}html body ol,html body ul{padding-left:2em}html body ol.no-list,html body ul.no-list{padding:0;list-style-type:none}html body ol ol,html body ol ul,html body ul ol,html body ul ul{margin-top:0;margin-bottom:0}html body li{margin-bottom:0}html body li.task-list-item{list-style:none}html body li>p{margin-top:0;margin-bottom:0}html body .task-list-item-checkbox{margin:0 .2em .25em -1.8em;vertical-align:middle}html body .task-list-item-checkbox:hover{cursor:pointer}html body blockquote{margin:16px 0;font-size:inherit;padding:0 15px;color:#5c5c5c;background-color:#f0f0f0;border-left:4px solid #d6d6d6}html body blockquote>:first-child{margin-top:0}html body blockquote>:last-child{margin-bottom:0}html body hr{height:4px;margin:32px 0;background-color:#d6d6d6;border:0 none}html body table{margin:10px 0 15px 0;border-collapse:collapse;border-spacing:0;display:block;width:100%;overflow:auto;word-break:normal;word-break:keep-all}html body table th{font-weight:700;color:#000}html body table td,html body table th{border:1px solid #d6d6d6;padding:6px 13px}html body dl{padding:0}html body dl dt{padding:0;margin-top:16px;font-size:1em;font-style:italic;font-weight:700}html body dl dd{padding:0 16px;margin-bottom:16px}html body code{font-family:Menlo,Monaco,Consolas,'Courier New',monospace;font-size:.85em;color:#000;background-color:#f0f0f0;border-radius:3px;padding:.2em 0}html body code::after,html body code::before{letter-spacing:-.2em;content:'\00a0'}html body pre>code{padding:0;margin:0;word-break:normal;white-space:pre;background:0 0;border:0}html body .highlight{margin-bottom:16px}html body .highlight pre,html body pre{padding:1em;overflow:auto;line-height:1.45;border:#d6d6d6;border-radius:3px}html body .highlight pre{margin-bottom:0;word-break:normal}html body pre code,html body pre tt{display:inline;max-width:initial;padding:0;margin:0;overflow:initial;line-height:inherit;word-wrap:normal;background-color:transparent;border:0}html body pre code:after,html body pre code:before,html body pre tt:after,html body pre tt:before{content:normal}html body blockquote,html body dl,html body ol,html body p,html body pre,html body ul{margin-top:0;margin-bottom:16px}html body kbd{color:#000;border:1px solid #d6d6d6;border-bottom:2px solid #c7c7c7;padding:2px 4px;background-color:#f0f0f0;border-radius:3px}@media print{html body{background-color:#fff}html body h1,html body h2,html body h3,html body h4,html body h5,html body h6{color:#000;page-break-after:avoid}html body blockquote{color:#5c5c5c}html body pre{page-break-inside:avoid}html body table{display:table}html body img{display:block;max-width:100%;max-height:100%}html body code,html body pre{word-wrap:break-word;white-space:pre}}.markdown-preview{width:100%;height:100%;box-sizing:border-box}.markdown-preview ul{list-style:disc}.markdown-preview ul ul{list-style:circle}.markdown-preview ul ul ul{list-style:square}.markdown-preview ol{list-style:decimal}.markdown-preview ol ol,.markdown-preview ul ol{list-style-type:lower-roman}.markdown-preview ol ol ol,.markdown-preview ol ul ol,.markdown-preview ul ol ol,.markdown-preview ul ul ol{list-style-type:lower-alpha}.markdown-preview .newpage,.markdown-preview .pagebreak{page-break-before:always}.markdown-preview pre.line-numbers{position:relative;padding-left:3.8em;counter-reset:linenumber}.markdown-preview pre.line-numbers>code{position:relative}.markdown-preview pre.line-numbers .line-numbers-rows{position:absolute;pointer-events:none;top:1em;font-size:100%;left:0;width:3em;letter-spacing:-1px;border-right:1px solid #999;-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none}.markdown-preview pre.line-numbers .line-numbers-rows>span{pointer-events:none;display:block;counter-increment:linenumber}.markdown-preview pre.line-numbers .line-numbers-rows>span:before{content:counter(linenumber);color:#999;display:block;padding-right:.8em;text-align:right}.markdown-preview .mathjax-exps .MathJax_Display{text-align:center!important}.markdown-preview:not([data-for=preview]) .code-chunk .code-chunk-btn-group{display:none}.markdown-preview:not([data-for=preview]) .code-chunk .status{display:none}.markdown-preview:not([data-for=preview]) .code-chunk .output-div{margin-bottom:16px}.markdown-preview .md-toc{padding:0}.markdown-preview .md-toc .md-toc-link-wrapper .md-toc-link{display:inline;padding:.25rem 0}.markdown-preview .md-toc .md-toc-link-wrapper .md-toc-link div,.markdown-preview .md-toc .md-toc-link-wrapper .md-toc-link p{display:inline}.markdown-preview .md-toc .md-toc-link-wrapper.highlighted .md-toc-link{font-weight:800}.scrollbar-style::-webkit-scrollbar{width:8px}.scrollbar-style::-webkit-scrollbar-track{border-radius:10px;background-color:transparent}.scrollbar-style::-webkit-scrollbar-thumb{border-radius:5px;background-color:rgba(150,150,150,.66);border:4px solid rgba(150,150,150,.66);background-clip:content-box}html body[for=html-export]:not([data-presentation-mode]){position:relative;width:100%;height:100%;top:0;left:0;margin:0;padding:0;overflow:auto}html body[for=html-export]:not([data-presentation-mode]) .markdown-preview{position:relative;top:0;min-height:100vh}@media screen and (min-width:914px){html body[for=html-export]:not([data-presentation-mode]) .markdown-preview{padding:2em calc(50% - 457px + 2em)}}@media screen and (max-width:914px){html body[for=html-export]:not([data-presentation-mode]) .markdown-preview{padding:2em}}@media screen and (max-width:450px){html body[for=html-export]:not([data-presentation-mode]) .markdown-preview{font-size:14px!important;padding:1em}}@media print{html body[for=html-export]:not([data-presentation-mode]) #sidebar-toc-btn{display:none}}html body[for=html-export]:not([data-presentation-mode]) #sidebar-toc-btn{position:fixed;bottom:8px;left:8px;font-size:28px;cursor:pointer;color:inherit;z-index:99;width:32px;text-align:center;opacity:.4}html body[for=html-export]:not([data-presentation-mode])[html-show-sidebar-toc] #sidebar-toc-btn{opacity:1}html body[for=html-export]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc{position:fixed;top:0;left:0;width:300px;height:100%;padding:32px 0 48px 0;font-size:14px;box-shadow:0 0 4px rgba(150,150,150,.33);box-sizing:border-box;overflow:auto;background-color:inherit}html body[for=html-export]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc::-webkit-scrollbar{width:8px}html body[for=html-export]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc::-webkit-scrollbar-track{border-radius:10px;background-color:transparent}html body[for=html-export]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc::-webkit-scrollbar-thumb{border-radius:5px;background-color:rgba(150,150,150,.66);border:4px solid rgba(150,150,150,.66);background-clip:content-box}html body[for=html-export]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc a{text-decoration:none}html body[for=html-export]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc .md-toc{padding:0 16px}html body[for=html-export]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc .md-toc .md-toc-link-wrapper .md-toc-link{display:inline;padding:.25rem 0}html body[for=html-export]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc .md-toc .md-toc-link-wrapper .md-toc-link div,html body[for=html-export]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc .md-toc .md-toc-link-wrapper .md-toc-link p{display:inline}html body[for=html-export]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc .md-toc .md-toc-link-wrapper.highlighted .md-toc-link{font-weight:800}html body[for=html-export]:not([data-presentation-mode])[html-show-sidebar-toc] .markdown-preview{left:300px;width:calc(100% - 300px);padding:2em calc(50% - 457px - 300px / 2);margin:0;box-sizing:border-box}@media screen and (max-width:1274px){html body[for=html-export]:not([data-presentation-mode])[html-show-sidebar-toc] .markdown-preview{padding:2em}}@media screen and (max-width:450px){html body[for=html-export]:not([data-presentation-mode])[html-show-sidebar-toc] .markdown-preview{width:100%}}html body[for=html-export]:not([data-presentation-mode]):not([html-show-sidebar-toc]) .markdown-preview{left:50%;transform:translateX(-50%)}html body[for=html-export]:not([data-presentation-mode]):not([html-show-sidebar-toc]) .md-sidebar-toc{display:none}
+/* Please visit the URL below for more information: */
+/*   https://shd101wyy.github.io/markdown-preview-enhanced/#/customize-css */
+
+      </style>
+      <!-- The content below will be included at the end of the <head> element. --><script type="text/javascript">
+  document.addEventListener("DOMContentLoaded", function () {
+    // your code here
+  });
+</script></head><body for="html-export">
+    
+    
+      <div class="crossnote markdown-preview  ">
+      
+<div class="md-toc">
+<details style="padding:0;;padding-left:0px;" open="">
+        <summary class="md-toc-link-wrapper">
+          <a href="#h5player" class="md-toc-link"><p>h5player</p>
+</a>
+          </summary>
+        <div>
+          <div class="md-toc-link-wrapper" style="padding:0;;display:list-item;list-style:square;margin-left:42px">
+          <a href="#描述" class="md-toc-link">
+            <p>描述</p>
+
+          </a></div><div class="md-toc-link-wrapper" style="padding:0;;display:list-item;list-style:square;margin-left:42px">
+          <a href="#版本" class="md-toc-link">
+            <p>版本</p>
+
+          </a></div><div class="md-toc-link-wrapper" style="padding:0;;display:list-item;list-style:square;margin-left:42px">
+          <a href="#媒体版本限制" class="md-toc-link">
+            <p>媒体版本限制</p>
+
+          </a></div><div class="md-toc-link-wrapper" style="padding:0;;display:list-item;list-style:square;margin-left:42px">
+          <a href="#使用注意事项" class="md-toc-link">
+            <p>使用注意事项</p>
+
+          </a></div><div class="md-toc-link-wrapper" style="padding:0;;display:list-item;list-style:square;margin-left:42px">
+          <a href="#浏览器限制以及编解码支持情况" class="md-toc-link">
+            <p>浏览器限制以及编解码支持情况</p>
+
+          </a></div><div class="md-toc-link-wrapper" style="padding:0;;display:list-item;list-style:square;margin-left:42px">
+          <a href="#接口调用流程图" class="md-toc-link">
+            <p>接口调用流程图</p>
+
+          </a></div><div class="md-toc-link-wrapper" style="padding:0;;display:list-item;list-style:square;margin-left:42px">
+          <a href="#引入" class="md-toc-link">
+            <p>引入</p>
+
+          </a></div><div class="md-toc-link-wrapper" style="padding:0;;display:list-item;list-style:square;margin-left:42px">
+          <a href="#创建实例" class="md-toc-link">
+            <p>创建实例</p>
+
+          </a></div><details style="padding:0;;padding-left:24px;" open="">
+        <summary class="md-toc-link-wrapper">
+          <a href="#接口说明" class="md-toc-link"><p>接口说明</p>
+</a>
+          </summary>
+        <div>
+          <div class="md-toc-link-wrapper" style="padding:0;;display:list-item;list-style:square;margin-left:42px">
+          <a href="#事件初始化-js_setwindowcontrolcallbackevents" class="md-toc-link">
+            <p>事件初始化: JS_SetWindowControlCallback(events)</p>
+
+          </a></div><div class="md-toc-link-wrapper" style="padding:0;;display:list-item;list-style:square;margin-left:42px">
+          <a href="#play" class="md-toc-link">
+            <p>播放: JS_Play(url, config, windowIndex, startTime, endTime)</p>
+
+          </a></div><div class="md-toc-link-wrapper" style="padding:0;;display:list-item;list-style:square;margin-left:42px">
+          <a href="#stop" class="md-toc-link">
+            <p>停止播放: JS_Stop(windowIndex)</p>
+
+          </a></div><div class="md-toc-link-wrapper" style="padding:0;;display:list-item;list-style:square;margin-left:42px">
+          <a href="#停止所有播放-js_stoprealplayall" class="md-toc-link">
+            <p>停止所有播放: JS_StopRealPlayAll()</p>
+
+          </a></div><div class="md-toc-link-wrapper" style="padding:0;;display:list-item;list-style:square;margin-left:42px">
+          <a href="#开启声音-js_opensoundwindowindex" class="md-toc-link">
+            <p>开启声音: JS_OpenSound(windowIndex)</p>
+
+          </a></div><div class="md-toc-link-wrapper" style="padding:0;;display:list-item;list-style:square;margin-left:42px">
+          <a href="#关闭声音-js_closesoundwindowindex" class="md-toc-link">
+            <p>关闭声音: JS_CloseSound(windowIndex)</p>
+
+          </a></div><div class="md-toc-link-wrapper" style="padding:0;;display:list-item;list-style:square;margin-left:42px">
+          <a href="#设置音量-js_setvolumewindowindex-volumn" class="md-toc-link">
+            <p>设置音量: JS_SetVolume(windowIndex, volumn)</p>
+
+          </a></div><div class="md-toc-link-wrapper" style="padding:0;;display:list-item;list-style:square;margin-left:42px">
+          <a href="#获取当前音量-js_getvolumewindowindex" class="md-toc-link">
+            <p>获取当前音量: JS_GetVolume(windowIndex)</p>
+
+          </a></div><div class="md-toc-link-wrapper" style="padding:0;;display:list-item;list-style:square;margin-left:42px">
+          <a href="#录像-js_startsaveexwindowindex-filename-idsttype" class="md-toc-link">
+            <p>录像: JS_StartSaveEx(windowIndex, fileName, idstType)</p>
+
+          </a></div><div class="md-toc-link-wrapper" style="padding:0;;display:list-item;list-style:square;margin-left:42px">
+          <a href="#停止录像并保存文件-js_stopsavewindowindex" class="md-toc-link">
+            <p>停止录像并保存文件: JS_StopSave(windowIndex)</p>
+
+          </a></div><div class="md-toc-link-wrapper" style="padding:0;;display:list-item;list-style:square;margin-left:42px">
+          <a href="#抓图-js_capturepicturewindowindex-filename-filetype-callback" class="md-toc-link">
+            <p>抓图: JS_CapturePicture(windowIndex, fileName, fileType, callback)</p>
+
+          </a></div><div class="md-toc-link-wrapper" style="padding:0;;display:list-item;list-style:square;margin-left:42px">
+          <a href="#回放js_playplay" class="md-toc-link">
+            </a><p><a href="#回放js_playplay" class="md-toc-link">回放：</a><a href="#play">JS_Play()</a></p>
+
+          </div><div class="md-toc-link-wrapper" style="padding:0;;display:list-item;list-style:square;margin-left:42px">
+          <a href="#停止回放js_stopstop" class="md-toc-link">
+            </a><p><a href="#停止回放js_stopstop" class="md-toc-link">停止回放：</a><a href="#stop">JS_Stop()</a></p>
+
+          </div><div class="md-toc-link-wrapper" style="padding:0;;display:list-item;list-style:square;margin-left:42px">
+          <a href="#暂停回放-js_pausewindowindex" class="md-toc-link">
+            <p>暂停回放: JS_Pause(windowIndex)</p>
+
+          </a></div><div class="md-toc-link-wrapper" style="padding:0;;display:list-item;list-style:square;margin-left:42px">
+          <a href="#恢复回放-js_resumewindowindex-bforward" class="md-toc-link">
+            <p>恢复回放: JS_Resume(windowIndex, bForward)</p>
+
+          </a></div><div class="md-toc-link-wrapper" style="padding:0;;display:list-item;list-style:square;margin-left:42px">
+          <a href="#开始对讲-js_starttalksztalkurl-oparam" class="md-toc-link">
+            <p>开始对讲: JS_StartTalk(szTalkUrl, oParam)</p>
+
+          </a></div><div class="md-toc-link-wrapper" style="padding:0;;display:list-item;list-style:square;margin-left:42px">
+          <a href="#停止对讲-js_stoptalk" class="md-toc-link">
+            <p>停止对讲: JS_StopTalk()</p>
+
+          </a></div><div class="md-toc-link-wrapper" style="padding:0;;display:list-item;list-style:square;margin-left:42px">
+          <a href="#设置对讲音量js_talksetvolumenvolume" class="md-toc-link">
+            <p>设置对讲音量：JS_TalkSetVolume(nVolume)</p>
+
+          </a></div><div class="md-toc-link-wrapper" style="padding:0;;display:list-item;list-style:square;margin-left:42px">
+          <a href="#获取对讲音量-js_talkgetvolume" class="md-toc-link">
+            <p>获取对讲音量: JS_TalkGetVolume()</p>
+
+          </a></div><div class="md-toc-link-wrapper" style="padding:0;;display:list-item;list-style:square;margin-left:42px">
+          <a href="#录制对讲声音-js_startsavetalkpcmname-type--2" class="md-toc-link">
+            <p>录制对讲声音: JS_StartSaveTalk(pcmname, type = 2)</p>
+
+          </a></div><div class="md-toc-link-wrapper" style="padding:0;;display:list-item;list-style:square;margin-left:42px">
+          <a href="#关闭录制对讲声音-js_stopsavetalk" class="md-toc-link">
+            <p>关闭录制对讲声音: JS_StopSaveTalk()</p>
+
+          </a></div><div class="md-toc-link-wrapper" style="padding:0;;display:list-item;list-style:square;margin-left:42px">
+          <a href="#录像-抓图功能同预览播放" class="md-toc-link">
+            <p>录像、抓图功能同预览播放</p>
+
+          </a></div><div class="md-toc-link-wrapper" style="padding:0;;display:list-item;list-style:square;margin-left:42px">
+          <a href="#回放快放-js_fastwindowindex" class="md-toc-link">
+            <p>回放快放: JS_Fast(windowIndex)</p>
+
+          </a></div><div class="md-toc-link-wrapper" style="padding:0;;display:list-item;list-style:square;margin-left:42px">
+          <a href="#回放慢放-js_slowwindowindex" class="md-toc-link">
+            <p>回放慢放: JS_Slow(windowIndex)</p>
+
+          </a></div><div class="md-toc-link-wrapper" style="padding:0;;display:list-item;list-style:square;margin-left:42px">
+          <a href="#回放定位-js_seekwindowindex-strattime-endtime" class="md-toc-link">
+            <p>回放定位: JS_Seek(windowIndex, stratTime, endTime)</p>
+
+          </a></div><div class="md-toc-link-wrapper" style="padding:0;;display:list-item;list-style:square;margin-left:42px">
+          <a href="#回放单帧进-js_frameforwardwindowindex" class="md-toc-link">
+            <p>回放单帧进: JS_FrameForward(windowIndex)</p>
+
+          </a></div><div class="md-toc-link-wrapper" style="padding:0;;display:list-item;list-style:square;margin-left:42px">
+          <a href="#回放单帧退-js_framebackwindowindex" class="md-toc-link">
+            <p>回放单帧退: JS_FrameBack(windowIndex)</p>
+
+          </a></div><div class="md-toc-link-wrapper" style="padding:0;;display:list-item;list-style:square;margin-left:42px">
+          <a href="#电子放大-js_enablezoomwindowindex" class="md-toc-link">
+            <p>电子放大: JS_EnableZoom(windowIndex)</p>
+
+          </a></div><div class="md-toc-link-wrapper" style="padding:0;;display:list-item;list-style:square;margin-left:42px">
+          <a href="#关闭电子放大-js_disablezoomwindowindex" class="md-toc-link">
+            <p>关闭电子放大: JS_DisableZoom(windowIndex)</p>
+
+          </a></div><div class="md-toc-link-wrapper" style="padding:0;;display:list-item;list-style:square;margin-left:42px">
+          <a href="#开启关闭智能信息展示高级模式功能-js_renderallprivatedataiwndnum-bopenflag" class="md-toc-link">
+            <p>开启/关闭智能信息展示（高级模式功能）: JS_RenderALLPrivateData(iWndNum, bOpenFlag)</p>
+
+          </a></div><div class="md-toc-link-wrapper" style="padding:0;;display:list-item;list-style:square;margin-left:42px">
+          <a href="#分屏-js_arrangewindowsplitnum" class="md-toc-link">
+            <p>分屏: JS_ArrangeWindow(splitNum)</p>
+
+          </a></div><div class="md-toc-link-wrapper" style="padding:0;;display:list-item;list-style:square;margin-left:42px">
+          <a href="#切换选中窗口-js_selectwndwindowindex" class="md-toc-link">
+            <p>切换选中窗口: JS_SelectWnd(windowIndex)</p>
+
+          </a></div><div class="md-toc-link-wrapper" style="padding:0;;display:list-item;list-style:square;margin-left:42px">
+          <a href="#整体全屏-js_fullscreendisplayisfull" class="md-toc-link">
+            <p>整体全屏: JS_FullScreenDisplay(isFull)</p>
+
+          </a></div><div class="md-toc-link-wrapper" style="padding:0;;display:list-item;list-style:square;margin-left:42px">
+          <a href="#单窗口全屏-js_fullscreensinglewindowindex" class="md-toc-link">
+            <p>单窗口全屏: JS_FullScreenSingle(windowIndex)</p>
+
+          </a></div><div class="md-toc-link-wrapper" style="padding:0;;display:list-item;list-style:square;margin-left:42px">
+          <a href="#设置窗口大小js_resize-iwidth-iheight" class="md-toc-link">
+            <p>设置窗口大小：JS_Resize (iWidth, iHeight)</p>
+
+          </a></div><div class="md-toc-link-wrapper" style="padding:0;;display:list-item;list-style:square;margin-left:42px">
+          <a href="#获取osd时间js_getosdtime-windowindex" class="md-toc-link">
+            <p>获取OSD时间：JS_GetOSDTime (windowIndex)</p>
+
+          </a></div><div class="md-toc-link-wrapper" style="padding:0;;display:list-item;list-style:square;margin-left:42px">
+          <a href="#获取音视频信息js_getvideoinfo-windowindex" class="md-toc-link">
+            <p>获取音视频信息：JS_GetVideoInfo (windowIndex)</p>
+
+          </a></div><div class="md-toc-link-wrapper" style="padding:0;;display:list-item;list-style:square;margin-left:42px">
+          <a href="#设置取流连接超时时间js_setconnecttimeout-windowindex-ntime" class="md-toc-link">
+            <p>设置取流连接超时时间：JS_SetConnectTimeOut (windowIndex, nTime)</p>
+
+          </a></div><div class="md-toc-link-wrapper" style="padding:0;;display:list-item;list-style:square;margin-left:42px">
+          <a href="#设置私有数据回调js_setadditiondatacbwindowindex-sztype-cbcallback" class="md-toc-link">
+            <p>设置私有数据回调：JS_SetAdditionDataCB(windowIndex, szType, cbCallback)</p>
+
+          </a></div><div class="md-toc-link-wrapper" style="padding:0;;display:list-item;list-style:square;margin-left:42px">
+          <a href="#设置traceidjs_settraceidwindowindex-bopenflag" class="md-toc-link">
+            <p>设置traceId：JS_SetTraceId(windowIndex, bOpenFlag)</p>
+
+          </a></div><div class="md-toc-link-wrapper" style="padding:0;;display:list-item;list-style:square;margin-left:42px">
+          <a href="#获取traceidjs_gettraceidwindowindex" class="md-toc-link">
+            <p>获取traceId：JS_GetTraceId(windowIndex)</p>
+
+          </a></div><div class="md-toc-link-wrapper" style="padding:0;;display:list-item;list-style:square;margin-left:42px">
+          <a href="#设置断流时间回调js_setinterrupttimeiwndnum-interrupttime" class="md-toc-link">
+            <p>设置断流时间回调：JS_SetInterruptTime(iWndNum, InterruptTime)</p>
+
+          </a></div><div class="md-toc-link-wrapper" style="padding:0;;display:list-item;list-style:square;margin-left:42px">
+          <a href="#判断是否支持回放优化js_optimizecapabilitywindowindex-szurl" class="md-toc-link">
+            <p>判断是否支持回放优化：JS_OptimizeCapability(windowIndex, szUrl)</p>
+
+          </a></div><div class="md-toc-link-wrapper" style="padding:0;;display:list-item;list-style:square;margin-left:42px">
+          <a href="#正倒放切换js_changemodewindowindex" class="md-toc-link">
+            <p>正倒放切换：JS_ChangeMode(windowIndex)</p>
+
+          </a></div><div class="md-toc-link-wrapper" style="padding:0;;display:list-item;list-style:square;margin-left:42px">
+          <a href="#开始缩略图js_startvideothumbnailswindowindex-url-szstarttime-szstoptime-ooption" class="md-toc-link">
+            <p>开始缩略图：JS_StartVideoThumbnails(windowIndex, url, szStartTime, szStopTime, oOption)</p>
+
+          </a></div><div class="md-toc-link-wrapper" style="padding:0;;display:list-item;list-style:square;margin-left:42px">
+          <a href="#获取缩略图js_getvideothumbnailswindowindex-videotime-cbcallback" class="md-toc-link">
+            <p>获取缩略图：JS_GetVideoThumbnails(windowIndex, videoTime, cbCallback)</p>
+
+          </a></div><div class="md-toc-link-wrapper" style="padding:0;;display:list-item;list-style:square;margin-left:42px">
+          <a href="#停止缩略图js_stopvideothumbnailswindowindex" class="md-toc-link">
+            <p>停止缩略图：JS_StopVideoThumbnails(windowIndex)</p>
+
+          </a></div><div class="md-toc-link-wrapper" style="padding:0;;display:list-item;list-style:square;margin-left:42px">
+          <a href="#直接倍数接口js_speedwindowindex-rate" class="md-toc-link">
+            <p>直接倍数接口：JS_Speed(windowIndex, rate)</p>
+
+          </a></div><div class="md-toc-link-wrapper" style="padding:0;;display:list-item;list-style:square;margin-left:42px">
+          <a href="#开启即时回放功能js_instantsetparamwindowindex-rate" class="md-toc-link">
+            <p>开启即时回放功能：JS_InstantSetParam(windowIndex, rate)</p>
+
+          </a></div><div class="md-toc-link-wrapper" style="padding:0;;display:list-item;list-style:square;margin-left:42px">
+          <a href="#开始即时回放js_startinstantwindowindex" class="md-toc-link">
+            <p>开始即时回放：JS_StartInstant(windowIndex)</p>
+
+          </a></div><div class="md-toc-link-wrapper" style="padding:0;;display:list-item;list-style:square;margin-left:42px">
+          <a href="#关闭即时回放js_stopinstantwindowindex" class="md-toc-link">
+            <p>关闭即时回放：JS_StopInstant(windowIndex)</p>
+
+          </a></div><div class="md-toc-link-wrapper" style="padding:0;;display:list-item;list-style:square;margin-left:42px">
+          <a href="#获取即时回放总长js_instanttotaldurationwindowindex" class="md-toc-link">
+            <p>获取即时回放总长：JS_InstantTotalDuration(windowIndex)</p>
+
+          </a></div><div class="md-toc-link-wrapper" style="padding:0;;display:list-item;list-style:square;margin-left:42px">
+          <a href="#获取即时回放当前播放长js_instantcurrdurationwindowindex" class="md-toc-link">
+            <p>获取即时回放当前播放长：JS_InstantCurrDuration(windowIndex)</p>
+
+          </a></div><div class="md-toc-link-wrapper" style="padding:0;;display:list-item;list-style:square;margin-left:42px">
+          <a href="#旋转js_rotatewindowindex-degree" class="md-toc-link">
+            <p>旋转：JS_Rotate(windowIndex, degree)</p>
+
+          </a></div><div class="md-toc-link-wrapper" style="padding:0;;display:list-item;list-style:square;margin-left:42px">
+          <a href="#缩放js_scalewindowindex-ratio" class="md-toc-link">
+            <p>缩放：JS_Scale(windowIndex, ratio)</p>
+
+          </a></div><div class="md-toc-link-wrapper" style="padding:0;;display:list-item;list-style:square;margin-left:42px">
+          <a href="#取消缩放旋转js_scalecancelwindowindex" class="md-toc-link">
+            <p>取消缩放旋转：JS_ScaleCancel(windowIndex)</p>
+
+          </a></div><div class="md-toc-link-wrapper" style="padding:0;;display:list-item;list-style:square;margin-left:42px">
+          <a href="#设置抓图水印js_setwatermarkconfigwatermarkconfig" class="md-toc-link">
+            <p>设置抓图水印：JS_SetWatermarkConfig(watermarkConfig)</p>
+
+          </a></div><div class="md-toc-link-wrapper" style="padding:0;;display:list-item;list-style:square;margin-left:42px">
+          <a href="#取消设置抓图水印js_cancelwatermarkconfig" class="md-toc-link">
+            <p>取消设置抓图水印：JS_CancelWatermarkConfig()</p>
+
+          </a></div>
+        </div>
+      </details>
+    <div class="md-toc-link-wrapper" style="padding:0;;display:list-item;list-style:square;margin-left:42px">
+          <a href="#错误码及其描述" class="md-toc-link">
+            <p>错误码及其描述</p>
+
+          </a></div><div class="md-toc-link-wrapper" style="padding:0;;display:list-item;list-style:square;margin-left:42px">
+          <a href="#faq" class="md-toc-link">
+            <p>FAQ</p>
+
+          </a></div>
+        </div>
+      </details>
+    
+</div>
+<h1 id="h5player">h5player </h1>
+<h2 id="描述">描述 </h2>
+<p>h5player是一个基于HTML5的流式网络视频播放器，无需安装浏览器插件即可通过websocket协议向媒体服务取流播放多种格式的音视频流。</p>
+<h2 id="版本">版本 </h2>
+<p>当前版本 2.5.1</p>
+<h2 id="媒体版本限制">媒体版本限制 </h2>
+<p>媒体网关:mgc_V5.13.100版本及以上</p>
+<h2 id="使用注意事项">使用注意事项 </h2>
+<p>1、使用wss协议时，由于媒体后台使用的是自签名证书，所以需要安装平台登录页面根证书后重启浏览器<br>
+2、在集成过程中new JSPlugin时候必填szBasePath变量, // 必填,与h5player.min.js的引用目录一致</p>
+<h2 id="浏览器限制以及编解码支持情况">浏览器限制以及编解码支持情况 </h2>
+<p>以下数据都是在pc chrome80+测试所得，更详细的数据请看功能性能规格文档</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">解码方式</th>
+<th style="text-align:center">浏览器限制</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">高级模式</td>
+<td style="text-align:center">当前支持 Chrome80+，ios safari,andriod browser</td>
+</tr>
+<tr>
+<td style="text-align:center">普通模式</td>
+<td style="text-align:center">除 IE 和 IOS Safari 外，基本都支持</td>
+</tr>
+</tbody>
+</table>
+<table>
+  <tbody><tr>
+    <th rowspan="2">解码方式</th>
+    <th colspan="2">视频编码格式</th>
+    <th colspan="8">音频编码格式</th>
+  </tr>
+  <tr>
+    <td>H264</td>
+    <td>H265</td>
+    <td>AAC</td>
+    <td>AACLD</td>
+    <td>ADPCM</td>
+    <td>G711</td>
+    <td>G722_1</td>
+    <td>G726</td>
+    <td>MP2L2</td>
+  </tr>
+  <tr align="middle">
+    <td>高级模式</td>
+    <td>✓</td>
+    <td>✓</td>
+    <td>✓</td>
+    <td>✓</td>
+    <td>✓</td>
+    <td>✓</td>
+    <td>✓</td>
+    <td>✓</td>
+    <td>✓</td>
+    <td>✓</td>
+  </tr>
+  <tr align="middle">
+    <td>普通模式</td>
+    <td>✓</td>
+    <td>✓</td>
+    <td>✓</td>
+    <td>✓</td>
+    <td>✓</td>
+    <td>✓</td>
+    <td>✓</td>
+    <td>✓</td>
+    <td>✓</td>
+    <td>✓</td>
+  </tr>
+</tbody></table>
+<table>
+  <tbody><tr>
+    <th rowspan="3">解码方式</th>
+    <th rowspan="3">视频编码格式</th>
+    <th rowspan="3">分辨率</th>
+    <th rowspan="3">视频参数(bps*fps)</th>
+    <th colspan="3">解码路数（系统：Win10）</th>
+  </tr>
+  <tr>
+    <th>CPU：<br>I7_8700K</th>
+    <th>CPU：<br>I5-9400/F</th>
+    <th>CPU：<br>I3-8100</th>
+  </tr>
+  <tr>
+    <th>显卡：RTX2080</th>
+    <th>显卡：GTX1050TI</th>
+    <th>显卡：GT1030D5</th>
+  </tr>
+  <tr align="middle">
+    <td rowspan="2">高级模式</td>
+    <td rowspan="2">H265&amp;H264</td>
+    <td>1080P</td>
+    <td>4M * 25</td>
+    <td>2</td>
+    <td>2</td>
+    <td>2</td>
+  </tr>
+  <tr align="middle">
+    <td>720P</td>
+    <td>2M * 25</td>
+    <td>4</td>
+    <td>4</td>
+    <td>4</td>
+  </tr>
+  <tr align="middle">
+ <td rowspan="2">普通模式</td>
+    <td rowspan="2">H265&amp;H264</td>
+    <td>1080P</td>
+    <td>4M * 25</td>
+    <td>24</td>
+    <td>20</td>
+    <td>9</td>
+  </tr>
+  <tr align="middle">
+    <td>720P</td>
+    <td>2M * 25</td>
+    <td>32</td>
+    <td>32</td>
+    <td>16</td>
+  </tr>
+</tbody></table>
+<h2 id="接口调用流程图">接口调用流程图 </h2>
+<p>其余控制接口调用都在JS_Play后调用</p>
+<div class="mermaid">graph TD
+    st[开始] --&gt; op1[创建实例：new JSPlugin]
+    op1 --&gt; op2[事件初始化：JS_SetWindowControlCallback]
+    op2 --&gt; op3[调用预览/回放接口：JS_Play]
+    op3 --&gt; op4[调用停止接口：JS_Stop]
+    op4 --&gt; e[结束]
+    style st fill:#f96,stroke:#333,stroke-width:4px
+    style e fill:#f96,stroke:#333,stroke-width:4px
+    style op1 fill:#d3d3d3,stroke:#333,stroke-width:2px
+    style op2 fill:#d3d3d3,stroke:#333,stroke-width:2px
+    style op3 fill:#d3d3d3,stroke:#333,stroke-width:2px
+    style op4 fill:#d3d3d3,stroke:#333,stroke-width:2px
+</div><h2 id="引入">引入 </h2>
+<p>直接用&lt;script&gt;标签引入</p>
+<pre data-role="codeBlock" data-info="" class="language-text"><code>&lt;!-- h5player --&gt;
+&lt;script src="h5player.min.js"&gt;&lt;/script&gt;
+</code></pre><h2 id="创建实例">创建实例 </h2>
+<pre data-role="codeBlock" data-info="" class="language-text"><code>&lt;body&gt;
+  &lt;div id="play_window"&gt;&lt;/div&gt;
+  &lt;script&gt;
+    var curIndex = 0; // 当前窗口下标
+    var myPlugin = new JSPlugin({
+      szId: 'play_window', //父窗口id，需要英文字母开头 必填
+      szBasePath: './dist', // 必填,与h5player.min.js的引用目录一致
+      mseWorkerEnable: false,//是否开启多线程解码，分辨率大于1080P建议开启，否则可能卡顿
+			bSupporDoubleClickFull: true,//是否支持双击全屏，true-双击是全屏；false-双击无响应
+      // 当容器div#play_window有固定宽高时，可不传iWidth和iHeight，窗口大小将自适应容器宽高
+      // iWidth: 600,
+      // iHeight: 400,
+
+      // 分屏播放，默认最大分屏4*4
+      // iMaxSplit: 4,
+      // iCurrentSplit: 1,
+    })
+  &lt;/script&gt;
+&lt;/body&gt;
+</code></pre><h2 id="接口说明">接口说明 </h2>
+<h3 id="事件初始化-js_setwindowcontrolcallbackevents">事件初始化: JS_SetWindowControlCallback(events) </h3>
+<p>参数：</p>
+<table>
+<thead>
+<tr>
+<th>参数名</th>
+<th>类型</th>
+<th>说明</th>
+<th>必需</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>events</td>
+<td>Object</td>
+<td>事件对应的处理函数集合</td>
+<td>是</td>
+</tr>
+<tr>
+<td>返回：Promise</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<pre data-role="codeBlock" data-info="" class="language-text"><code>JS_SetWindowControlCallback({
+  windowEventSelect: function (index) {  //插件选中窗口回调
+      curIndex = index;
+      console.log('selectWindow changed:', index);
+  },
+  pluginErrorHandler: function (index, iErrorCode, oError) {  //插件错误回调，iErrorCode为错误码，oError错误来源（样式：errPlatformIp=10.19.147.57;errPlatformName=本级）
+      // do you want...
+      // 取流失败，流中断等错误都会触发该回调函数，请自行对照错误码表进行判断。
+      // 业务上层可在此做一些个性化操作，如：个性化错误信息展示，重新取流等。
+  },
+  windowEventOver: function (index) {  //鼠标移过回调
+      // do you want...
+  },
+  windowEventOut: function (index) {  //鼠标移出回调
+      // do you want...
+  },
+  windowEventUp: function (index) {  //鼠标mouseup事件回调
+      // do you want...
+  },
+  windowFullCcreenChange: function (bFull) {  //全屏切换回调
+      // do you want...
+  },
+  firstFrameDisplay: function (index, iWidth, iHeight) {  //首帧显示回调
+      // do you want...
+  },
+  performanceLack: function () {  //性能不足回调
+      // do you want...
+  },
+  StreamEnd: function (index) {  //回放结束回调,返回对应测窗口id
+      // do you want...
+  },
+  InterruptStream: function (iWndIndex, interruptTime) {  //断流事件回调，interruptTime为秒级
+      console.log('recv InterruptStream windowsId: '+iWndIndex+'interrupt time:'+interruptTime);
+  }, 
+  talkPluginErrorHandler: (iErrorCode, oErrorInfo) =&gt; {  //对讲错误回调
+      console.log('recv talkPluginErrorHandler: '+iErrorCode);
+  },
+  ThumbnailsEvent: (iWndIndex, eventType, eventCode) =&gt; { //缩略图事件回调
+    console.log('recv ThumbnailsEvent: '+iWndIndex+", eventType:"+eventType+", eventCode:"+eventCode);
+  },
+});
+</code></pre><h3 id="play">播放: JS_Play(url, config, windowIndex, startTime, endTime) </h3>
+<p>说明：倒放功能并不是所有设备都支持，云存储和cvr，nvr可支持，19年之后出厂的设备都可支持。<br>
+参数：</p>
+<table>
+<thead>
+<tr>
+<th>参数名</th>
+<th>类型</th>
+<th>说明</th>
+<th>必需</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>url</td>
+<td>String</td>
+<td>流媒体URL</td>
+<td>是</td>
+</tr>
+<tr>
+<td>config</td>
+<td>Object</td>
+<td>播放配置</td>
+<td>必传,详情见示例</td>
+</tr>
+<tr>
+<td>windowIndex</td>
+<td>Number</td>
+<td>当前窗口下标</td>
+<td>是</td>
+</tr>
+<tr>
+<td>startTime</td>
+<td>DateTime</td>
+<td>回放开始时间，格式类型：2021-06-29T00:00:00Z</td>
+<td>预览不能填，回放必填</td>
+</tr>
+<tr>
+<td>endTime</td>
+<td>DateTime</td>
+<td>回放结束时间，格式类型：2021-06-29T00:00:00Z</td>
+<td>预览不能填，回放必填</td>
+</tr>
+<tr>
+<td>返回：Promise</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<pre data-role="codeBlock" data-info="" class="language-text"><code>let url = document.getElementById('url').value;
+let startTime, endTime;
+myPlugin.JS_Play(
+  url,
+  {
+    playURL: url, // 流媒体播放时必传
+    mode: 0, // 解码类型：0=普通模式; 1=高级模式 默认为0
+    PlayBackMode: 1,//1：绝对时间正放; 3 绝对时间倒放 默认为1
+    keepDecoder 0: // 0:回收解码资源; 1:不回收解码资源。为1时相同的编码格式，通过直接调用js_play接口切换点位不黑屏。默认0
+    token: token, //开启安全认证使用的token，在后端开启安全认证时使用
+    // ...
+  },
+  curIndex, //当前窗口下标
+
+  // 回放参数
+  startTime,
+  endTime
+).then(
+  () =&gt; {
+    console.info('JS_Play success');
+    // do you want...
+  },
+  (err) =&gt; {
+    console.info('JS_Play failed:', err);
+    // do you want...
+  }
+);
+</code></pre><h3 id="stop">停止播放: JS_Stop(windowIndex) </h3>
+<p>参数：</p>
+<table>
+<thead>
+<tr>
+<th>参数名</th>
+<th>类型</th>
+<th>说明</th>
+<th>必需</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>windowIndex</td>
+<td>Number</td>
+<td>窗口下标</td>
+<td>是</td>
+</tr>
+<tr>
+<td>返回：Promise</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<pre data-role="codeBlock" data-info="" class="language-text"><code>myPlugin.JS_Stop(curIndex).then(
+  () =&gt; {
+    console.info('JS_Stop success');
+    // do you want...
+  },
+  (err) =&gt; {
+    console.info('JS_Stop failed:', err);
+    // do you want...
+  }
+);
+</code></pre><h3 id="停止所有播放-js_stoprealplayall">停止所有播放: JS_StopRealPlayAll() </h3>
+<p>参数：无<br>
+返回：Promise</p>
+<pre data-role="codeBlock" data-info="" class="language-text"><code>myPlugin.JS_StopRealPlayAll().then(
+  () =&gt; {
+    console.info('JS_StopRealPlayAll success');
+    // do you want...
+  },
+  (err) =&gt; {
+    console.info('JS_StopRealPlayAll failed');
+    // do you want...
+  }
+);
+</code></pre><h3 id="开启声音-js_opensoundwindowindex">开启声音: JS_OpenSound(windowIndex) </h3>
+<p>参数：<br>
+说明：一个实例下只支持一路声音播放，开启下一路会默认关闭上一路声音。倍数和倒放不支持声音播放</p>
+<table>
+<thead>
+<tr>
+<th>参数名</th>
+<th>类型</th>
+<th>说明</th>
+<th>必需</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>windowIndex</td>
+<td>Number</td>
+<td>窗口下标</td>
+<td>否，不传时默认开启当前选中窗口的声音</td>
+</tr>
+<tr>
+<td>返回：Promise</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<pre data-role="codeBlock" data-info="" class="language-text"><code>myPlugin.JS_OpenSound(curIndex).then(
+  () =&gt; {
+    console.info('JS_OpenSound success');
+    // do you want...
+  },
+  (err) =&gt; {
+    console.info('JS_OpenSound failed');
+    // do you want...
+  }
+);
+</code></pre><h3 id="关闭声音-js_closesoundwindowindex">关闭声音: JS_CloseSound(windowIndex) </h3>
+<p>参数：</p>
+<table>
+<thead>
+<tr>
+<th>参数名</th>
+<th>类型</th>
+<th>说明</th>
+<th>必需</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>windowIndex</td>
+<td>Number</td>
+<td>窗口下标</td>
+<td>否，不传时默认关闭当前选中窗口的声音</td>
+</tr>
+<tr>
+<td>返回：Promise</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<pre data-role="codeBlock" data-info="" class="language-text"><code>myPlugin.JS_CloseSound(curIndex).then(
+  () =&gt; {
+    console.info('JS_CloseSound success');
+    // do you want...
+  },
+  (err) =&gt; {
+    console.info('JS_CloseSound failed');
+    // do you want...
+  }
+);
+</code></pre><h3 id="设置音量-js_setvolumewindowindex-volumn">设置音量: JS_SetVolume(windowIndex, volumn) </h3>
+<p>参数：</p>
+<table>
+<thead>
+<tr>
+<th>参数名</th>
+<th>类型</th>
+<th>说明</th>
+<th>必需</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>windowIndex</td>
+<td>Number</td>
+<td>窗口下标</td>
+<td>是</td>
+</tr>
+<tr>
+<td>volumn</td>
+<td>Number</td>
+<td>音量大小</td>
+<td>是，范围1~100，默认50</td>
+</tr>
+<tr>
+<td>返回：Promise</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<pre data-role="codeBlock" data-info="" class="language-text"><code>myPlugin.JS_SetVolume(curIndex, volumn).then(
+  () =&gt; {
+    console.info('JS_SetVolume success');
+    // do you want...
+  },
+  (err) =&gt; {
+    console.info('JS_SetVolume failed');
+    // do you want...
+  }
+);
+</code></pre><h3 id="获取当前音量-js_getvolumewindowindex">获取当前音量: JS_GetVolume(windowIndex) </h3>
+<p>参数：</p>
+<table>
+<thead>
+<tr>
+<th>参数名</th>
+<th>类型</th>
+<th>说明</th>
+<th>必需</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>windowIndex</td>
+<td>Number</td>
+<td>窗口下标</td>
+<td>是</td>
+</tr>
+<tr>
+<td>返回：Promise</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<pre data-role="codeBlock" data-info="" class="language-text"><code>myPlugin.JS_GetVolume(curIndex).then(
+  (volumn) =&gt; { //在不设置音量的情况下默认50
+    console.info('JS_GetVolume success', volumn);
+    // do you want...
+  },
+  (err) =&gt; {
+    console.info('JS_GetVolume failed');
+    // do you want...
+  }
+);
+</code></pre><h3 id="录像-js_startsaveexwindowindex-filename-idsttype">录像: JS_StartSaveEx(windowIndex, fileName, idstType) </h3>
+<p>说明：倒放情况下不支持该功能<br>
+参数：</p>
+<table>
+<thead>
+<tr>
+<th>参数名</th>
+<th>类型</th>
+<th>说明</th>
+<th>必需</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>windowIndex</td>
+<td>Number</td>
+<td>窗口下标</td>
+<td>是</td>
+</tr>
+<tr>
+<td>fileName</td>
+<td>String</td>
+<td>文件名(保证全局唯一性)</td>
+<td>是，可不带后缀，默认为.mp4</td>
+</tr>
+<tr>
+<td>idstType</td>
+<td>Number</td>
+<td>录像文件类型</td>
+<td>是，2-ps 5-mp4 ,mp4录制音频限制，仅支持AAC、G711A、G711U</td>
+</tr>
+<tr>
+<td>返回：Promise</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<pre data-role="codeBlock" data-info="" class="language-text"><code>let fileName = 'fileName.mp4';
+myPlugin.JS_StartSaveEx(curIndex, fileName, 2).then(
+  () =&gt; {
+    console.info('JS_StartSave success');
+    // do you want...
+  },
+  (err) =&gt; {
+    console.info('JS_StartSave failed');
+    // do you want...
+  }
+);
+</code></pre><h3 id="停止录像并保存文件-js_stopsavewindowindex">停止录像并保存文件: JS_StopSave(windowIndex) </h3>
+<p>参数：</p>
+<table>
+<thead>
+<tr>
+<th>参数名</th>
+<th>类型</th>
+<th>说明</th>
+<th>必需</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>windowIndex</td>
+<td>Number</td>
+<td>窗口下标</td>
+<td>是</td>
+</tr>
+<tr>
+<td>返回：Promise</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<pre data-role="codeBlock" data-info="" class="language-text"><code>let fileName = 'fileName.mp4';
+myPlugin.JS_StopSave(windowIndex).then(
+  () =&gt; {
+    console.info('JS_StopSave success');
+    // do you want...
+  },
+  (err) =&gt; {
+    console.info('JS_StopSave failed');
+    // do you want...
+  }
+);
+</code></pre><h3 id="抓图-js_capturepicturewindowindex-filename-filetype-callback">抓图: JS_CapturePicture(windowIndex, fileName, fileType, callback) </h3>
+<p>参数：</p>
+<table>
+<thead>
+<tr>
+<th>参数名</th>
+<th>类型</th>
+<th>说明</th>
+<th>必需</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>windowIndex</td>
+<td>Number</td>
+<td>窗口下标</td>
+<td>是</td>
+</tr>
+<tr>
+<td>fileName</td>
+<td>String</td>
+<td>文件名</td>
+<td>是</td>
+</tr>
+<tr>
+<td>fileType</td>
+<td>String</td>
+<td>文件类型</td>
+<td>是，'JPEG'</td>
+</tr>
+<tr>
+<td>callback</td>
+<td>Fuction</td>
+<td>回调函数</td>
+<td>否,回调图片数据，不进行下载操作</td>
+</tr>
+<tr>
+<td>返回：Promise</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<pre data-role="codeBlock" data-info="" class="language-text"><code>let fileName = 'img';
+let fileType = 'JPEG';
+//下载到本地
+myPlugin.JS_CapturePicture(curIndex, fileName, fileType).then(
+  () =&gt; {
+    console.info('JS_CapturePicture success');
+    // do you want...
+  },
+  (err) =&gt; {
+    console.info('JS_CapturePicture failed');
+    // do you want...
+  }
+);
+//不进行下载，数据回调
+myPlugin.JS_CapturePicture(curIndex, fileName, fileType，imageData =&gt; {
+    console.info('JS_CapturePicture success', imageData); //2.1.0开始全是base64，之前的版本存在blob或者是base64
+    // do you want...
+})
+
+</code></pre><h3 id="回放js_playplay">回放：<a href="#play">JS_Play()</a> </h3>
+<h3 id="停止回放js_stopstop">停止回放：<a href="#stop">JS_Stop()</a> </h3>
+<h3 id="暂停回放-js_pausewindowindex">暂停回放: JS_Pause(windowIndex) </h3>
+<p>参数：</p>
+<table>
+<thead>
+<tr>
+<th>参数名</th>
+<th>类型</th>
+<th>说明</th>
+<th>必需</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>windowIndex</td>
+<td>Number</td>
+<td>窗口下标</td>
+<td>是</td>
+</tr>
+<tr>
+<td>返回：Promise</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<pre data-role="codeBlock" data-info="" class="language-text"><code>myPlugin.JS_Pause(curIndex).then(
+  () =&gt; {
+    console.info('JS_Pause success');
+    // do you want...
+  },
+  (err) =&gt; {
+    console.info('JS_Pause failed');
+    // do you want...
+  }
+);
+</code></pre><h3 id="恢复回放-js_resumewindowindex-bforward">恢复回放: JS_Resume(windowIndex, bForward) </h3>
+<p>参数：</p>
+<table>
+<thead>
+<tr>
+<th>参数名</th>
+<th>类型</th>
+<th>说明</th>
+<th>必需</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>windowIndex</td>
+<td>Number</td>
+<td>窗口下标</td>
+<td>是</td>
+</tr>
+<tr>
+<td>bForward</td>
+<td>boolean</td>
+<td>单帧情况下，正向恢复为true,倒向恢复为false</td>
+<td>否，单帧时入参即可</td>
+</tr>
+<tr>
+<td>返回：Promise</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<pre data-role="codeBlock" data-info="" class="language-text"><code>myPlugin.JS_Resume(curIndex).then(
+  () =&gt; {
+    console.info('JS_Resume success');
+    // do you want...
+  },
+  (err) =&gt; {
+    console.info('JS_Resume failed');
+    // do you want...
+  }
+);
+</code></pre><h3 id="开始对讲-js_starttalksztalkurl-oparam">开始对讲: JS_StartTalk(szTalkUrl, oParam) </h3>
+<p>特殊声明：由于浏览器的安全限制，该功能只能在https域下使用，只支持一路对讲<br>
+参数：</p>
+<table>
+<thead>
+<tr>
+<th>参数名</th>
+<th>类型</th>
+<th>说明</th>
+<th>必需</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>szTalkUrl</td>
+<td>String</td>
+<td>对讲URL</td>
+<td>是</td>
+</tr>
+<tr>
+<td>oParam</td>
+<td>object</td>
+<td>对讲URL</td>
+<td>否</td>
+</tr>
+<tr>
+<td>返回：Promise</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<pre data-role="codeBlock" data-info="" class="language-text"><code>myPlugin.JS_StartTalk(szTalkUrl, {
+  token: token //安全认证token
+  }).then(
+  () =&gt; {
+    console.info('JS_StartTalk success');
+    // do you want...
+  },
+  (err) =&gt; {
+    console.info('JS_StartTalk failed');
+    // do you want...
+  }
+);
+</code></pre><h3 id="停止对讲-js_stoptalk">停止对讲: JS_StopTalk() </h3>
+<p>返回：Promise</p>
+<pre data-role="codeBlock" data-info="" class="language-text"><code>myPlugin.JS_StopTalk().then(
+  () =&gt; {
+    console.info('JS_StopTalk success');
+    // do you want...
+  },
+  (err) =&gt; {
+    console.info('JS_StopTalk failed');
+    // do you want...
+  }
+);
+</code></pre><h3 id="设置对讲音量js_talksetvolumenvolume">设置对讲音量：JS_TalkSetVolume(nVolume) </h3>
+<p>参数：</p>
+<table>
+<thead>
+<tr>
+<th>参数名</th>
+<th>类型</th>
+<th>说明</th>
+<th>必需</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>nVolume</td>
+<td>number</td>
+<td>音量大小（0-100）</td>
+<td>否</td>
+</tr>
+<tr>
+<td>返回：Promise</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<pre data-role="codeBlock" data-info="" class="language-text"><code>myPlugin.设置对讲音量：JS_TalkSetVolume(nVolume).then(
+  () =&gt; {
+    console.info('JS_TalkSetVolume success');
+    // do you want...
+  },
+  (err) =&gt; {
+    console.info('JS_TalkSetVolume failed');
+    // do you want...
+  }
+);
+</code></pre><h3 id="获取对讲音量-js_talkgetvolume">获取对讲音量: JS_TalkGetVolume() </h3>
+<p>返回：Promise</p>
+<pre data-role="codeBlock" data-info="" class="language-text"><code>myPlugin.JS_TalkGetVolume().then(
+  () =&gt; {
+    console.info('JS_TalkGetVolume success');
+    // do you want...
+  },
+  (err) =&gt; {
+    console.info('JS_TalkGetVolume failed');
+    // do you want...
+  }
+);
+</code></pre><h3 id="录制对讲声音-js_startsavetalkpcmname-type--2">录制对讲声音: JS_StartSaveTalk(pcmname, type = 2) </h3>
+<table>
+<thead>
+<tr>
+<th>参数名</th>
+<th>类型</th>
+<th>说明</th>
+<th>必需</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>pcmname</td>
+<td>string</td>
+<td>音频文件名字</td>
+<td>是</td>
+</tr>
+<tr>
+<td>type</td>
+<td>number</td>
+<td>录制类型=&gt; 0:设备的声音，1:客户端的声音, 2:双向声音</td>
+<td>否，默认2</td>
+</tr>
+<tr>
+<td>返回：Promise</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<pre data-role="codeBlock" data-info="" class="language-text"><code>let fileName = `${moment().format('YYYYMMDDHHmmss')}.mp3`
+myPlugin.JS_StartSaveTalk(fileName, 2).then(
+  () =&gt; {
+    console.info('JS_StartSaveTalk success');
+    // do you want...
+  },
+  (err) =&gt; {
+    console.info('JS_StartSaveTalk failed');
+    // do you want...
+  }
+);
+</code></pre><h3 id="关闭录制对讲声音-js_stopsavetalk">关闭录制对讲声音: JS_StopSaveTalk() </h3>
+<p>返回：Promise</p>
+<pre data-role="codeBlock" data-info="" class="language-text"><code>myPlugin.JS_StopSaveTalk().then(
+  () =&gt; {
+    console.info('JS_StopSaveTalk success');
+    // do you want...
+  },
+  (err) =&gt; {
+    console.info('JS_StopSaveTalk failed');
+    // do you want...
+  }
+);
+</code></pre><h3 id="录像-抓图功能同预览播放">录像、抓图功能同预览播放 </h3>
+<h3 id="回放快放-js_fastwindowindex">回放快放: JS_Fast(windowIndex) </h3>
+<p>调节播放倍速为当前播放速度的2倍，最大为8倍。<br>
+参数：</p>
+<table>
+<thead>
+<tr>
+<th>参数名</th>
+<th>类型</th>
+<th>说明</th>
+<th>必需</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>windowIndex</td>
+<td>Number</td>
+<td>窗口下标</td>
+<td>是</td>
+</tr>
+<tr>
+<td>返回：Promise</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<pre data-role="codeBlock" data-info="" class="language-text"><code>myPlugin.JS_Fast(curIndex).then(
+  rate =&gt; {
+    console.info('JS_Fast success:', rate);
+    // do you want...
+  },
+  (err) =&gt; {
+    console.info('JS_Fast failed');
+    // do you want...
+  }
+);
+</code></pre><h3 id="回放慢放-js_slowwindowindex">回放慢放: JS_Slow(windowIndex) </h3>
+<p>调节播放倍速为当前播放速度的1/2倍，最小为1/8倍。<br>
+参数：</p>
+<table>
+<thead>
+<tr>
+<th>参数名</th>
+<th>类型</th>
+<th>说明</th>
+<th>必需</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>windowIndex</td>
+<td>Number</td>
+<td>窗口下标</td>
+<td>是</td>
+</tr>
+<tr>
+<td>返回：Promise</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<pre data-role="codeBlock" data-info="" class="language-text"><code>myPlugin.JS_Slow(curIndex).then(
+  rate =&gt; {
+    console.info('JS_Slow success:', rate);
+    // do you want...
+  },
+  (err) =&gt; {
+    console.info('JS_Slow failed');
+    // do you want...
+  }
+);
+</code></pre><h3 id="回放定位-js_seekwindowindex-strattime-endtime">回放定位: JS_Seek(windowIndex, stratTime, endTime) </h3>
+<p>说明：单帧进情况下进行定位就是前进播放，单帧退情况下进行定位就是后退播放<br>
+参数：</p>
+<table>
+<thead>
+<tr>
+<th>参数名</th>
+<th>类型</th>
+<th>说明</th>
+<th>必需</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>windowIndex</td>
+<td>Number</td>
+<td>窗口下标</td>
+<td>是</td>
+</tr>
+<tr>
+<td>stratTime</td>
+<td>DateTime</td>
+<td>开始时间，格式类型：2021-06-29T00:00:00Z</td>
+<td>是</td>
+</tr>
+<tr>
+<td>endTime</td>
+<td>DateTime</td>
+<td>结束时间，格式类型：2021-06-29T00:00:00Z</td>
+<td>是</td>
+</tr>
+<tr>
+<td>返回：Promise</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<pre data-role="codeBlock" data-info="" class="language-text"><code>myPlugin.JS_Seek(curIndex，zStartDate, szEndDate).then(
+  () =&gt; {
+    console.info('JS_Seek success');
+    // do you want...
+  },
+  (err) =&gt; {
+    console.info('JS_Seek failed');
+    // do you want...
+  }
+);
+</code></pre><h3 id="回放单帧进-js_frameforwardwindowindex">回放单帧进: JS_FrameForward(windowIndex) </h3>
+<p>说明：该功能在https+chrome94级以上+H5player2.3.0+普通模式支持。<br>
+大于1倍数情况下不支持单帧操作<br>
+参数：</p>
+<table>
+<thead>
+<tr>
+<th>参数名</th>
+<th>类型</th>
+<th>说明</th>
+<th>必需</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>windowIndex</td>
+<td>Number</td>
+<td>窗口下标</td>
+<td>是</td>
+</tr>
+<tr>
+<td>返回：Promise</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<pre data-role="codeBlock" data-info="" class="language-text"><code>myPlugin.JS_FrameForward(curIndex).then(
+  () =&gt; {
+    console.info('JS_FrameForward success');
+    // do you want...
+  },
+  (err) =&gt; {
+    console.info('JS_FrameForward failed');
+    // do you want...
+  }
+);
+</code></pre><h3 id="回放单帧退-js_framebackwindowindex">回放单帧退: JS_FrameBack(windowIndex) </h3>
+<p>说明：该功能在https+chrome94级以上+H5player2.3.0+普通模式支持。该功能存在媒体版本限制，需要更新组件vnsc1.16.101+、mgc5.16.101+、dac1.15.102+、vod5.15.100+、sac1.8.100+、ncg5.15.101+。<br>
+高级模式下该接口调用一次会大概跳12帧，倒放时缓存帧有限，效果不佳请知悉<br>
+大于1倍数情况下不支持单帧操作<br>
+参数：</p>
+<table>
+<thead>
+<tr>
+<th>参数名</th>
+<th>类型</th>
+<th>说明</th>
+<th>必需</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>windowIndex</td>
+<td>Number</td>
+<td>窗口下标</td>
+<td>是</td>
+</tr>
+<tr>
+<td>返回：Promise</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<pre data-role="codeBlock" data-info="" class="language-text"><code>myPlugin.JS_FrameBack(curIndex).then(
+  () =&gt; {
+    console.info('JS_FrameBack success');
+    // do you want...
+  },
+  (err) =&gt; {
+    console.info('JS_FrameBack failed');
+    // do you want...
+  }
+);
+</code></pre><h3 id="电子放大-js_enablezoomwindowindex">电子放大: JS_EnableZoom(windowIndex) </h3>
+<p>说明：该功能在https+chrome94级以上+H5player2.3.0+普通模式支持<br>
+参数：</p>
+<table>
+<thead>
+<tr>
+<th>参数名</th>
+<th>类型</th>
+<th>说明</th>
+<th>必需</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>windowIndex</td>
+<td>Number</td>
+<td>窗口下标</td>
+<td>否，不传时默认开启当前选中窗口的电子放大功能</td>
+</tr>
+<tr>
+<td>返回：Promise</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<pre data-role="codeBlock" data-info="" class="language-text"><code>myPlugin.JS_EnableZoom(curIndex).then(
+  () =&gt; {
+    console.info('JS_EnableZoom success');
+    // do you want...
+  },
+  (err) =&gt; {
+    console.info('JS_EnableZoom failed');
+    // do you want...
+  }
+);
+</code></pre><h3 id="关闭电子放大-js_disablezoomwindowindex">关闭电子放大: JS_DisableZoom(windowIndex) </h3>
+<p>参数：</p>
+<table>
+<thead>
+<tr>
+<th>参数名</th>
+<th>类型</th>
+<th>说明</th>
+<th>必需</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>windowIndex</td>
+<td>Number</td>
+<td>窗口下标</td>
+<td>否，不传时默认关闭当前选中窗口的电子放大功能</td>
+</tr>
+<tr>
+<td>返回：Promise</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<pre data-role="codeBlock" data-info="" class="language-text"><code>myPlugin.JS_DisableZoom(curIndex).then(
+  () =&gt; {
+    console.info('JS_DisableZoom success');
+    // do you want...
+  },
+  (err) =&gt; {
+    console.info('JS_DisableZoom failed');
+    // do you want...
+  }
+);
+</code></pre><h3 id="开启关闭智能信息展示高级模式功能-js_renderallprivatedataiwndnum-bopenflag">开启/关闭智能信息展示（高级模式功能）: JS_RenderALLPrivateData(iWndNum, bOpenFlag) </h3>
+<p>参数：</p>
+<table>
+<thead>
+<tr>
+<th>参数名</th>
+<th>类型</th>
+<th>说明</th>
+<th>必需</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>iWndNum</td>
+<td>Number</td>
+<td>窗口下标</td>
+<td>是</td>
+</tr>
+<tr>
+<td>bOpenFlag</td>
+<td>Boolean</td>
+<td>开启/关闭</td>
+<td>是</td>
+</tr>
+<tr>
+<td>返回：Promise</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<pre data-role="codeBlock" data-info="" class="language-text"><code>myPlugin.JS_RenderALLPrivateData(iWndNum, true).then(
+  () =&gt; {
+    console.info('JS_RenderALLPrivateData success');
+    // do you want...
+  },
+  (err) =&gt; {
+    console.info('JS_RenderALLPrivateData failed');
+    // do you want...
+  }
+);
+</code></pre><h3 id="分屏-js_arrangewindowsplitnum">分屏: JS_ArrangeWindow(splitNum) </h3>
+<p>参数：</p>
+<table>
+<thead>
+<tr>
+<th>参数名</th>
+<th>类型</th>
+<th>说明</th>
+<th>必需</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>splitNum</td>
+<td>Number</td>
+<td>分隔数</td>
+<td>是， 范围：1~4</td>
+</tr>
+<tr>
+<td>返回：Promise</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>分隔数</td>
+<td>分屏效果</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>----</td>
+<td>----</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>1</td>
+<td>1x1</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>2</td>
+<td>2x2</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>3</td>
+<td>3x3</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>4</td>
+<td>4x4</td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<pre data-role="codeBlock" data-info="" class="language-text"><code>myPlugin.JS_ArrangeWindow(splitNum).then(
+  () =&gt; {
+    console.info('JS_ArrangeWindow success');
+    // do you want...
+  },
+  (err) =&gt; {
+    console.info('JS_ArrangeWindow failed');
+    // do you want...
+  }
+);
+</code></pre><h3 id="切换选中窗口-js_selectwndwindowindex">切换选中窗口: JS_SelectWnd(windowIndex) </h3>
+<p>参数：</p>
+<table>
+<thead>
+<tr>
+<th>参数名</th>
+<th>类型</th>
+<th>说明</th>
+<th>必需</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>windowIndex</td>
+<td>Number</td>
+<td>窗口下标</td>
+<td>是</td>
+</tr>
+<tr>
+<td>返回：Promise</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<pre data-role="codeBlock" data-info="" class="language-text"><code>myPlugin.JS_SelectWnd(windowIndex).then(
+  () =&gt; {
+    console.info('JS_SelectWnd success');
+    // do you want...
+  },
+  (err) =&gt; {
+    console.info('JS_SelectWnd failed');
+    // do you want...
+  }
+);
+</code></pre><h3 id="整体全屏-js_fullscreendisplayisfull">整体全屏: JS_FullScreenDisplay(isFull) </h3>
+<p>参数：</p>
+<table>
+<thead>
+<tr>
+<th>参数名</th>
+<th>类型</th>
+<th>说明</th>
+<th>必需</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>isFull</td>
+<td>Boolean</td>
+<td>是否全屏</td>
+<td>是</td>
+</tr>
+<tr>
+<td>返回：Promise</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<pre data-role="codeBlock" data-info="" class="language-text"><code>myPlugin.JS_FullScreenDisplay(true).then(
+  () =&gt; {
+    console.info('JS_FullScreenDisplay success');
+    // do you want...
+  },
+  (err) =&gt; {
+    console.info('JS_FullScreenDisplay failed');
+    // do you want...
+  }
+);
+</code></pre><h3 id="单窗口全屏-js_fullscreensinglewindowindex">单窗口全屏: JS_FullScreenSingle(windowIndex) </h3>
+<p>参数：</p>
+<table>
+<thead>
+<tr>
+<th>参数名</th>
+<th>类型</th>
+<th>说明</th>
+<th>必需</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>windowIndex</td>
+<td>Number</td>
+<td>窗口下标</td>
+<td>是</td>
+</tr>
+<tr>
+<td>返回：Promise</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<pre data-role="codeBlock" data-info="" class="language-text"><code>myPlugin.JS_FullScreenSingle(curIndex).then(
+  () =&gt; {
+    console.info('JS_FullScreenSingle success');
+    // do you want...
+  },
+  (err) =&gt; {
+    console.info('JS_FullScreenSingle failed');
+    // do you want...
+  }
+);
+</code></pre><h3 id="设置窗口大小js_resize-iwidth-iheight">设置窗口大小：JS_Resize (iWidth, iHeight) </h3>
+<p>参数：</p>
+<table>
+<thead>
+<tr>
+<th>参数名</th>
+<th>类型</th>
+<th>说明</th>
+<th>必需</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>iWidth</td>
+<td>Number</td>
+<td>播放页面宽度</td>
+<td>否，不传时默认父窗口大小</td>
+</tr>
+<tr>
+<td>iHeight</td>
+<td>Number</td>
+<td>播放页面高度</td>
+<td>否，不传时默认父窗口大小</td>
+</tr>
+<tr>
+<td>返回：Promise</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<pre data-role="codeBlock" data-info="" class="language-text"><code>myPlugin.JS_Resize().then(
+  () =&gt; {
+    console.info('JS_Resize success');
+    // do you want...
+  },
+  (err) =&gt; {
+    console.info('JS_Resize failed');
+    // do you want...
+  }
+);
+</code></pre><h3 id="获取osd时间js_getosdtime-windowindex">获取OSD时间：JS_GetOSDTime (windowIndex) </h3>
+<p>参数：</p>
+<table>
+<thead>
+<tr>
+<th>参数名</th>
+<th>类型</th>
+<th>说明</th>
+<th>必需</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>windowIndex</td>
+<td>Number</td>
+<td>窗口下标</td>
+<td>是</td>
+</tr>
+<tr>
+<td>返回：Promise</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>成功返回从1970-1-1 00:00:00 到该日期对象的毫秒数,但是获取的精度只到秒级别，毫秒都是0</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<pre data-role="codeBlock" data-info="" class="language-text"><code>myPlugin.JS_GetOSDTime(curIndex).then(
+  (time) =&gt; {
+    console.info("osdTime:", new Date(time));
+    // do you want...
+  },
+  (err) =&gt; {
+    console.info('JS_GetOSDTime failed');
+    // do you want...
+  }
+);
+</code></pre><h3 id="获取音视频信息js_getvideoinfo-windowindex">获取音视频信息：JS_GetVideoInfo (windowIndex) </h3>
+<p>参数：</p>
+<table>
+<thead>
+<tr>
+<th>参数名</th>
+<th>类型</th>
+<th>说明</th>
+<th>必需</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>windowIndex</td>
+<td>Number</td>
+<td>窗口下标</td>
+<td>是</td>
+</tr>
+<tr>
+<td>返回：Promise</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>videoInfo = {</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<pre class="language-text">  VideType: 'h264',  //视频编码格式
+  audioType: 'without',//音频编码格式
+  width: 0,//视频分辨率的宽
+  height: 0,//视频分辨率的高
+  frameRate: 25,//视频帧率
+  bitRate: 2048,//视频码率，单位：Kb/s
+  systemFormt: "ps"//视频封装格式
+</pre>
+<p>};</p>
+<pre data-role="codeBlock" data-info="" class="language-text"><code>myPlugin.JS_GetVideoInfo(curIndex).then(
+  (VideoInfo) =&gt; {
+    console.info("VideoInfo:", VideoInfo);
+    // do you want...
+  },
+  (err) =&gt; {
+    console.info('JS_GetVideoInfo failed');
+    // do you want...
+  }
+);
+</code></pre><h3 id="设置取流连接超时时间js_setconnecttimeout-windowindex-ntime">设置取流连接超时时间：JS_SetConnectTimeOut (windowIndex, nTime) </h3>
+<p>参数：<br>
+说明：该接口不调用时默认12s,在JS_Play之前调用</p>
+<table>
+<thead>
+<tr>
+<th>参数名</th>
+<th>类型</th>
+<th>说明</th>
+<th>必需</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>windowIndex</td>
+<td>Number</td>
+<td>窗口下标</td>
+<td>是</td>
+</tr>
+<tr>
+<td>nTime</td>
+<td>Number</td>
+<td>超时时间</td>
+<td>是，不传时默认12秒，单位秒</td>
+</tr>
+<tr>
+<td>返回：Promise</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<pre data-role="codeBlock" data-info="" class="language-text"><code>myPlugin.JS_SetConnectTimeOut(curIndex, nTime).then(
+  () =&gt; {
+    console.info('JS_SetConnectTimeOut success');
+    // do you want...
+  },
+  (err) =&gt; {
+    console.info('JS_SetConnectTimeOut failed');
+    // do you want...
+  }
+);
+</code></pre><h3 id="设置私有数据回调js_setadditiondatacbwindowindex-sztype-cbcallback">设置私有数据回调：JS_SetAdditionDataCB(windowIndex, szType, cbCallback) </h3>
+<p>参数：</p>
+<table>
+<thead>
+<tr>
+<th>参数名</th>
+<th>类型</th>
+<th>说明</th>
+<th>必需</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>windowIndex</td>
+<td>Number</td>
+<td>窗口下标</td>
+<td>是</td>
+</tr>
+<tr>
+<td>szType</td>
+<td>Number</td>
+<td>数据类型</td>
+<td>是，0x0101: 定制温度 0x0103: 基线温度裸数据 0x0006: 车载行车信息 0x0009: 车载调试信息 0x0007: POS 信息解析回调 0x0010: 汽车电子私有信息 0x0011: 无人机私有信息 0x0804: 数立体云防私有数据 0x000B: 设备扩展信息</td>
+</tr>
+<tr>
+<td>cbCallback</td>
+<td>function</td>
+<td>回调函数</td>
+<td>是，function(dataType, dataStrVersion, dataTimeStamp, additionDataBuffer)</td>
+</tr>
+</tbody>
+</table>
+<p>返回：Promise</p>
+<pre data-role="codeBlock" data-info="" class="language-text"><code>myPlugin.JS_SetAdditionDataCB(curIndex, 0x0804, function(dataType,dataStrVersion, dataTimeStamp, additionDataBuffer){
+  console.log(" JSPlayM4_AdditionDataCBFun dataType:"+dataType +",dataStrVersion:"+dataStrVersion+",dataTimeStamp:"+dataTimeStamp);
+  }).then(
+  () =&gt; {
+    console.info('JS_SetAdditionDataCB success');
+    // do you want...
+  },
+  (err) =&gt; {
+    console.info('JS_SetAdditionDataCB failed');
+    // do you want...
+  }
+);
+</code></pre><h3 id="设置traceidjs_settraceidwindowindex-bopenflag">设置traceId：JS_SetTraceId(windowIndex, bOpenFlag) </h3>
+<p>说明：traceId是查询调用链的唯一标识，H5player不做调用链埋点，只拼接traceId，traceId建议在传入url的时候自行拼接<br>
+拼接规则：取流url中无?则拼接?traceId=uuid(随机生成的一个id编号);有?则拼接&amp;traceId=uuid<br>
+示例：wss://10.19.147.57:6014/proxy/10.19.147.57:559/EUrl/SiSnW6z?traceId=d9d0766e3b3f7a41<br>
+参数：</p>
+<table>
+<thead>
+<tr>
+<th>参数名</th>
+<th>类型</th>
+<th>说明</th>
+<th>必需</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>windowIndex</td>
+<td>Number</td>
+<td>窗口下标</td>
+<td>是</td>
+</tr>
+<tr>
+<td>bOpenFlag</td>
+<td>Number</td>
+<td>是否设置traceId</td>
+<td>是,该接口不调用默认false</td>
+</tr>
+</tbody>
+</table>
+<p>返回：Promise</p>
+<pre data-role="codeBlock" data-info="" class="language-text"><code>myPlugin.JS_SetTraceId(curIndex, bOpenFlag).then(
+  () =&gt; {
+    console.info('JS_SetTraceId success');
+    // do you want...
+  },
+  (err) =&gt; {
+    console.info('JS_SetTraceId failed');
+    // do you want...
+  }
+);
+</code></pre><h3 id="获取traceidjs_gettraceidwindowindex">获取traceId：JS_GetTraceId(windowIndex) </h3>
+<p>说明：traceId是查询调用链的唯一标识，H5player不做调用链埋点，只拼接traceId，traceId建议在传入url的时候自行拼接，更方便应用层管理，h5player内部会检测无traceId时会默认拼接上<br>
+拼接规则：取流url中无?则拼接?traceId=uuid(随机生成的一个id编号);有?则拼接&amp;traceId=uuid<br>
+示例：wss://10.19.147.57:6014/proxy/10.19.147.57:559/EUrl/SiSnW6z?traceId=d9d0766e3b3f7a41<br>
+参数：</p>
+<table>
+<thead>
+<tr>
+<th>参数名</th>
+<th>类型</th>
+<th>说明</th>
+<th>必需</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>windowIndex</td>
+<td>Number</td>
+<td>窗口下标</td>
+<td>是</td>
+</tr>
+</tbody>
+</table>
+<p>返回：Promise</p>
+<pre data-role="codeBlock" data-info="" class="language-text"><code>myPlugin.JS_GetTraceId(curIndex).then(
+  (traceId) =&gt; {
+    console.info('JS_GetTraceId success', traceId);
+    // do you want...
+  },
+  (err) =&gt; {
+    console.info('JS_GetTraceId failed');
+    // do you want...
+  }
+);
+</code></pre><h3 id="设置断流时间回调js_setinterrupttimeiwndnum-interrupttime">设置断流时间回调：JS_SetInterruptTime(iWndNum, InterruptTime) </h3>
+<p>说明：断流的事件统一从JS_SetWindowControlCallback的InterruptStream回调，InterruptTime为检测无码流的时间，每过InterruptTime回调一次断流事件，未设置默认每过5s无码流回调一次断流事件<br>
+参数：</p>
+<table>
+<thead>
+<tr>
+<th>参数名</th>
+<th>类型</th>
+<th>说明</th>
+<th>必需</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>windowIndex</td>
+<td>Number</td>
+<td>窗口下标</td>
+<td>是</td>
+</tr>
+<tr>
+<td>InterruptTime</td>
+<td>Number</td>
+<td>检测断流时间阈值,单位：秒,默认5秒</td>
+<td>是</td>
+</tr>
+</tbody>
+</table>
+<p>返回：Promise</p>
+<pre data-role="codeBlock" data-info="" class="language-text"><code>let InterruptTime = 5;
+myPlugin.JS_SetInterruptTime(iWndNum, InterruptTime).then(
+  () =&gt; {
+    console.info('JS_SetInterruptTime success');
+    // do you want...
+  },
+  (err) =&gt; {
+    console.info('JS_SetInterruptTime failed');
+    // do you want...
+  }
+);
+</code></pre><h3 id="判断是否支持回放优化js_optimizecapabilitywindowindex-szurl">判断是否支持回放优化：JS_OptimizeCapability(windowIndex, szUrl) </h3>
+<p>说明：调用该接口，判断是否支持回放优化功能<br>
+参数：</p>
+<table>
+<thead>
+<tr>
+<th>参数名</th>
+<th>类型</th>
+<th>说明</th>
+<th>必需</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>windowIndex</td>
+<td>Number</td>
+<td>窗口下标</td>
+<td>是</td>
+</tr>
+<tr>
+<td>szUrl</td>
+<td>string</td>
+<td>url</td>
+<td>是,未播放时已该url为准--精确度低，播放成功后以实际状态为准--精确度高</td>
+</tr>
+</tbody>
+</table>
+<p>返回：Promise</p>
+<pre data-role="codeBlock" data-info="" class="language-text"><code>/******考虑到存在滞后性，公布判断条件:***/
+if (szUrl.search("mark") !== -1) {
+    let mark = atob(szUrl.split('mark/').pop().split('?').shift());
+    if (mark === "storageOptimize=1&amp;mediaOptimize=1") {
+      //仅该情况支持
+    }
+}
+/******end****/
+myPlugin.JS_OptimizeCapability(curIndex, szUrl).then(
+  () =&gt; {
+      console.info('JS_OptimizeCapability support');
+    // do you want...
+  },
+  (err) =&gt; {
+    console.error('JS_OptimizeCapability unsupport',err);
+    // do you want...
+  });
+</code></pre><h3 id="正倒放切换js_changemodewindowindex">正倒放切换：JS_ChangeMode(windowIndex) </h3>
+<p>说明：调用该接口，会快速进行正倒放切换，当正放时会切成倒放；当倒放时会切成正放。该功能在https+chrome94级以上+H5player2.3.0+普通模式也支持。该功能存在媒体版本限制，需要更新组件vnsc1.16.101+、mgc5.16.101+、dac1.15.102+、vod5.15.100+、sac1.8.100+、ncg5.15.101+。<br>
+参数：</p>
+<table>
+<thead>
+<tr>
+<th>参数名</th>
+<th>类型</th>
+<th>说明</th>
+<th>必需</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>windowIndex</td>
+<td>Number</td>
+<td>窗口下标</td>
+<td>是</td>
+</tr>
+</tbody>
+</table>
+<p>返回：Promise</p>
+<pre data-role="codeBlock" data-info="" class="language-text"><code>myPlugin.JS_ChangeMode(curIndex).then(
+  () =&gt; {
+    console.info('JS_ChangeMode success');
+    // do you want...
+  },
+  (err) =&gt; {
+    console.info('JS_ChangeMode failed');
+    // do you want...
+  }
+);
+</code></pre><h3 id="开始缩略图js_startvideothumbnailswindowindex-url-szstarttime-szstoptime-ooption">开始缩略图：JS_StartVideoThumbnails(windowIndex, url, szStartTime, szStopTime, oOption) </h3>
+<p>说明：调用该接口，传入的开始时间和结束时间是回放的开始和结束时间。需要更新组件vnsc1.16.101+、mgc5.16.101+、dac1.15.102+、vod5.15.100+、sac1.8.100+、ncg5.15.101+。<br>
+参数：</p>
+<table>
+<thead>
+<tr>
+<th>参数名</th>
+<th>类型</th>
+<th>说明</th>
+<th>必需</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>windowIndex</td>
+<td>Number</td>
+<td>窗口下标</td>
+<td>是</td>
+</tr>
+<tr>
+<td>url</td>
+<td>string</td>
+<td>回放url</td>
+<td>是</td>
+</tr>
+<tr>
+<td>szStartTime</td>
+<td>string</td>
+<td>回放的开始时间</td>
+<td>是 ，时间格式示例："2022-10-09T08:47:36.000+08:00"</td>
+</tr>
+<tr>
+<td>szStopTime</td>
+<td>string</td>
+<td>回放的结束时间</td>
+<td>是 ，时间格式示例："2022-10-09T08:47:36.000+08:00"</td>
+</tr>
+<tr>
+<td>oOption</td>
+<td>Object</td>
+<td>缩略图的宽高，snapwidth, snapheight</td>
+<td>是</td>
+</tr>
+</tbody>
+</table>
+<p>返回：Promise</p>
+<pre data-role="codeBlock" data-info="" class="language-text"><code>let oOption = {
+  snapwidth:500,
+  snapheight:400,
+  token:""//安全认证token
+}
+myPlugin.JS_StartVideoThumbnails(curIndex, url, szStartTime, szStopTime, oOption).then(
+  () =&gt; {
+    console.info('JS_StartVideoThumbnails success');
+    // do you want...
+  },
+  (err) =&gt; {
+    console.info('JS_StartVideoThumbnails failed');
+    // do you want...
+  }
+);
+</code></pre><h3 id="获取缩略图js_getvideothumbnailswindowindex-videotime-cbcallback">获取缩略图：JS_GetVideoThumbnails(windowIndex, videoTime, cbCallback) </h3>
+<p>说明：该功能存在媒体版本限制，需要更新组件vnsc1.16.101+、mgc5.16.101+、dac1.15.102+、vod5.15.100+、sac1.8.100+、ncg5.15.101+。<br>
+参数：</p>
+<table>
+<thead>
+<tr>
+<th>参数名</th>
+<th>类型</th>
+<th>说明</th>
+<th>必需</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>windowIndex</td>
+<td>Number</td>
+<td>窗口下标</td>
+<td>是</td>
+</tr>
+<tr>
+<td>videoTime</td>
+<td>string</td>
+<td>缩略图时间</td>
+<td>是 ，时间格式示例："2022-10-09T08:47:36.000+08:00"</td>
+</tr>
+<tr>
+<td>cbCallback</td>
+<td>string</td>
+<td>缩略图的回调函数</td>
+<td>是</td>
+</tr>
+</tbody>
+</table>
+<p>返回：Promise</p>
+<pre data-role="codeBlock" data-info="" class="language-text"><code>function Thumbnailcb(timestamp,binaryData) {
+console.log("timestamp:"+timestamp+", binaryData:"+binaryData)
+},
+myPlugin.JS_GetVideoThumbnails(curIndex, videoTime, Thumbnailcb).then(
+  () =&gt; {
+    console.info('JS_GetVideoThumbnails success');
+    // do you want...
+  },
+  (err) =&gt; {
+    console.info('JS_GetVideoThumbnails failed');
+    // do you want...
+  }
+);
+</code></pre><h3 id="停止缩略图js_stopvideothumbnailswindowindex">停止缩略图：JS_StopVideoThumbnails(windowIndex) </h3>
+<p>说明：该功能存在媒体版本限制，需要更新组件vnsc1.16.101+、mgc5.16.101+、dac1.15.102+、vod5.15.100+、sac1.8.100+、ncg5.15.101+。<br>
+参数：</p>
+<table>
+<thead>
+<tr>
+<th>参数名</th>
+<th>类型</th>
+<th>说明</th>
+<th>必需</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>windowIndex</td>
+<td>Number</td>
+<td>窗口下标</td>
+<td>是</td>
+</tr>
+</tbody>
+</table>
+<p>返回：Promise</p>
+<pre data-role="codeBlock" data-info="" class="language-text"><code>myPlugin.JS_StopVideoThumbnails(curIndex).then(
+  () =&gt; {
+    console.info('JS_StopVideoThumbnails success');
+    // do you want...
+  },
+  (err) =&gt; {
+    console.info('JS_StopVideoThumbnails failed');
+    // do you want...
+  }
+);
+</code></pre><h3 id="直接倍数接口js_speedwindowindex-rate">直接倍数接口：JS_Speed(windowIndex, rate) </h3>
+<p>说明：&gt;8倍数场景，需要更新组件vnsc1.16.101+、mgc5.16.101+、dac1.15.102+、vod5.15.100+、sac1.8.100+、ncg5.15.101+。<br>
+参数：</p>
+<table>
+<thead>
+<tr>
+<th>参数名</th>
+<th>类型</th>
+<th>说明</th>
+<th>必需</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>windowIndex</td>
+<td>Number</td>
+<td>窗口下标</td>
+<td>是</td>
+</tr>
+<tr>
+<td>rate</td>
+<td>Number</td>
+<td>倍数，仅支持-8、-4、-2、1、2、4、8、16、32、64入参,-8表示1/8，-4表示1/4，-2表示1/2</td>
+<td>是</td>
+</tr>
+</tbody>
+</table>
+<p>返回：Promise</p>
+<pre data-role="codeBlock" data-info="" class="language-text"><code>myPlugin.JS_Speed(curIndex, rate).then(
+  rate =&gt; {
+    console.info('JS_Speed success:',rate);
+    // do you want...
+  },
+  (err) =&gt; {
+    console.info('JS_Speed failed');
+    // do you want...
+  }
+);
+</code></pre><h3 id="开启即时回放功能js_instantsetparamwindowindex-rate">开启即时回放功能：JS_InstantSetParam(windowIndex, rate) </h3>
+<p>说明：该功能在https+chrome94级以上+H5player2.5.0+普通模式支持，只需要每次在预览成功后调用一次即可<br>
+参数：</p>
+<table>
+<thead>
+<tr>
+<th>参数名</th>
+<th>类型</th>
+<th>说明</th>
+<th>必需</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>windowIndex</td>
+<td>Number</td>
+<td>窗口下标</td>
+<td>是</td>
+</tr>
+<tr>
+<td>option</td>
+<td>Object</td>
+<td>bOpenflag true为开启即时回放，在预览过程中会一直循环缓冲数据，对性能有一定影响，bInstantTime入参仅支持10,20,30秒。即时回放的时长</td>
+<td>是</td>
+</tr>
+</tbody>
+</table>
+<p>返回：Promise</p>
+<pre data-role="codeBlock" data-info="" class="language-text"><code>let option = {
+  bOpenflag: true,//开启即时回放
+  bInstantTime: 10//即时回放的总时长
+}
+myPlugin.JS_InstantSetParam(curIndex, option).then(
+  () =&gt; {
+    console.info('JS_InstantSetParam success');
+    // do you want...
+  },
+  (err) =&gt; {
+    console.info('JS_InstantSetParam failed');
+    // do you want...
+  }
+);
+</code></pre><h3 id="开始即时回放js_startinstantwindowindex">开始即时回放：JS_StartInstant(windowIndex) </h3>
+<p>说明：该接口之前必须调用JS_InstantSetParam后等待2秒以上，否则无效，开始后会循环播放缓存数据，直到调用JS_StopInstant为止。调用JS_StopInstant后可再次调用JS_StartInstant<br>
+参数：</p>
+<table>
+<thead>
+<tr>
+<th>参数名</th>
+<th>类型</th>
+<th>说明</th>
+<th>必需</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>windowIndex</td>
+<td>Number</td>
+<td>窗口下标</td>
+<td>是</td>
+</tr>
+</tbody>
+</table>
+<p>返回：Promise</p>
+<pre data-role="codeBlock" data-info="" class="language-text"><code>myPlugin.JS_StartInstant(curIndex).then(
+  () =&gt; {
+    console.info('JS_StartInstant success');
+    // do you want...
+  },
+  (err) =&gt; {
+    console.info('JS_StartInstant failed:'， err);
+    // do you want...
+  }
+);
+</code></pre><h3 id="关闭即时回放js_stopinstantwindowindex">关闭即时回放：JS_StopInstant(windowIndex) </h3>
+<p>说明：关闭时会正常跳回预览<br>
+参数：</p>
+<table>
+<thead>
+<tr>
+<th>参数名</th>
+<th>类型</th>
+<th>说明</th>
+<th>必需</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>windowIndex</td>
+<td>Number</td>
+<td>窗口下标</td>
+<td>是</td>
+</tr>
+</tbody>
+</table>
+<p>返回：Promise</p>
+<pre data-role="codeBlock" data-info="" class="language-text"><code>myPlugin.JS_StopInstant(curIndex).then(
+  () =&gt; {
+    console.info('JS_StopInstant success');
+    // do you want...
+  },
+  (err) =&gt; {
+    console.info('JS_StopInstant failed:'， err);
+    // do you want...
+  }
+);
+</code></pre><h3 id="获取即时回放总长js_instanttotaldurationwindowindex">获取即时回放总长：JS_InstantTotalDuration(windowIndex) </h3>
+<p>参数：</p>
+<table>
+<thead>
+<tr>
+<th>参数名</th>
+<th>类型</th>
+<th>说明</th>
+<th>必需</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>windowIndex</td>
+<td>Number</td>
+<td>窗口下标</td>
+<td>是</td>
+</tr>
+</tbody>
+</table>
+<p>返回：Promise</p>
+<pre data-role="codeBlock" data-info="" class="language-text"><code>myPlugin.JS_InstantTotalDuration(curIndex).then(
+  duration =&gt; {
+    console.info('JS_InstantTotalDuration success:',duration);
+    // do you want...
+  },
+  (err) =&gt; {
+    console.info('JS_InstantTotalDuration failed:'， err);
+    // do you want...
+  }
+);
+</code></pre><h3 id="获取即时回放当前播放长js_instantcurrdurationwindowindex">获取即时回放当前播放长：JS_InstantCurrDuration(windowIndex) </h3>
+<p>说明：从1开始<br>
+参数：</p>
+<table>
+<thead>
+<tr>
+<th>参数名</th>
+<th>类型</th>
+<th>说明</th>
+<th>必需</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>windowIndex</td>
+<td>Number</td>
+<td>窗口下标</td>
+<td>是</td>
+</tr>
+</tbody>
+</table>
+<p>返回：Promise</p>
+<pre data-role="codeBlock" data-info="" class="language-text"><code>myPlugin.JS_InstantCurrDuration(curIndex).then(
+  duration =&gt; {
+    console.info('JS_InstantCurrDuration success:',duration);
+    // do you want...
+  },
+  (err) =&gt; {
+    console.info('JS_InstantCurrDuration failed:'， err);
+    // do you want...
+  }
+);
+</code></pre><h3 id="旋转js_rotatewindowindex-degree">旋转：JS_Rotate(windowIndex, degree) </h3>
+<p>说明：旋转成功后，再调抓图接口，得到的图片为旋转后的图片<br>
+参数：</p>
+<table>
+<thead>
+<tr>
+<th>参数名</th>
+<th>类型</th>
+<th>说明</th>
+<th>必需</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>windowIndex</td>
+<td>Number</td>
+<td>窗口下标</td>
+<td>是</td>
+</tr>
+<tr>
+<td>degree</td>
+<td>Number</td>
+<td>旋转角度（顺时针, 支持0、90、180、270）<br>默认值：0</td>
+<td>是</td>
+</tr>
+</tbody>
+</table>
+<p>返回：Promise</p>
+<pre data-role="codeBlock" data-info="js" class="language-javascript js"><code>myPlugin<span class="token punctuation">.</span><span class="token method function property-access"><span class="token maybe-class-name">JS_Rotate</span></span><span class="token punctuation">(</span>curIndex<span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">)</span>
+  <span class="token punctuation">.</span><span class="token method function property-access">then</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token arrow operator">=&gt;</span> <span class="token punctuation">{</span> <span class="token console class-name">console</span><span class="token punctuation">.</span><span class="token method function property-access">log</span><span class="token punctuation">(</span><span class="token string">'Success'</span><span class="token punctuation">)</span> <span class="token punctuation">}</span><span class="token punctuation">)</span>
+  <span class="token punctuation">.</span><span class="token keyword control-flow keyword-catch">catch</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token parameter">errCode</span><span class="token punctuation">)</span> <span class="token arrow operator">=&gt;</span> <span class="token punctuation">{</span> <span class="token console class-name">console</span><span class="token punctuation">.</span><span class="token method function property-access">error</span><span class="token punctuation">(</span><span class="token string">'Failed'</span><span class="token punctuation">,</span> errCode<span class="token punctuation">)</span> <span class="token punctuation">}</span><span class="token punctuation">)</span>
+</code></pre><h3 id="缩放js_scalewindowindex-ratio">缩放：JS_Scale(windowIndex, ratio) </h3>
+<p>参数：</p>
+<table>
+<thead>
+<tr>
+<th>参数名</th>
+<th>类型</th>
+<th>说明</th>
+<th>必需</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>windowIndex</td>
+<td>Number</td>
+<td>窗口下标</td>
+<td>是</td>
+</tr>
+<tr>
+<td>ratio</td>
+<td>String</td>
+<td>缩放比例（支持："original"-视频原始分辨率、"fill"-平铺、"16:9"、"4:3"、"9:16"、"3:4"）<br>默认值："fill"</td>
+<td>是</td>
+</tr>
+</tbody>
+</table>
+<p>返回：Promise</p>
+<pre data-role="codeBlock" data-info="js" class="language-javascript js"><code>myPlugin<span class="token punctuation">.</span><span class="token method function property-access"><span class="token maybe-class-name">JS_Scale</span></span><span class="token punctuation">(</span>curIndex<span class="token punctuation">,</span> <span class="token string">'fill'</span><span class="token punctuation">)</span>
+  <span class="token punctuation">.</span><span class="token method function property-access">then</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token arrow operator">=&gt;</span> <span class="token punctuation">{</span> <span class="token console class-name">console</span><span class="token punctuation">.</span><span class="token method function property-access">log</span><span class="token punctuation">(</span><span class="token string">'Success'</span><span class="token punctuation">)</span> <span class="token punctuation">}</span><span class="token punctuation">)</span>
+  <span class="token punctuation">.</span><span class="token keyword control-flow keyword-catch">catch</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token parameter">errCode</span><span class="token punctuation">)</span> <span class="token arrow operator">=&gt;</span> <span class="token punctuation">{</span> <span class="token console class-name">console</span><span class="token punctuation">.</span><span class="token method function property-access">error</span><span class="token punctuation">(</span><span class="token string">'Failed'</span><span class="token punctuation">,</span> errCode<span class="token punctuation">)</span> <span class="token punctuation">}</span><span class="token punctuation">)</span>
+</code></pre><h3 id="取消缩放旋转js_scalecancelwindowindex">取消缩放旋转：JS_ScaleCancel(windowIndex) </h3>
+<p>说明：同时取消缩放和旋转，若想单独取消，可调对应接口设置回默认值<br>
+参数：</p>
+<table>
+<thead>
+<tr>
+<th>参数名</th>
+<th>类型</th>
+<th>说明</th>
+<th>必需</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>windowIndex</td>
+<td>Number</td>
+<td>窗口下标</td>
+<td>是</td>
+</tr>
+</tbody>
+</table>
+<p>返回：Promise</p>
+<pre data-role="codeBlock" data-info="js" class="language-javascript js"><code>myPlugin<span class="token punctuation">.</span><span class="token method function property-access"><span class="token maybe-class-name">JS_ScaleCancel</span></span><span class="token punctuation">(</span>curIndex<span class="token punctuation">)</span>
+  <span class="token punctuation">.</span><span class="token method function property-access">then</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token arrow operator">=&gt;</span> <span class="token punctuation">{</span> <span class="token console class-name">console</span><span class="token punctuation">.</span><span class="token method function property-access">log</span><span class="token punctuation">(</span><span class="token string">'Success'</span><span class="token punctuation">)</span> <span class="token punctuation">}</span><span class="token punctuation">)</span>
+  <span class="token punctuation">.</span><span class="token keyword control-flow keyword-catch">catch</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token parameter">errCode</span><span class="token punctuation">)</span> <span class="token arrow operator">=&gt;</span> <span class="token punctuation">{</span> <span class="token console class-name">console</span><span class="token punctuation">.</span><span class="token method function property-access">error</span><span class="token punctuation">(</span><span class="token string">'Failed'</span><span class="token punctuation">,</span> errCode<span class="token punctuation">)</span> <span class="token punctuation">}</span><span class="token punctuation">)</span>
+</code></pre><h3 id="设置抓图水印js_setwatermarkconfigwatermarkconfig">设置抓图水印：JS_SetWatermarkConfig(watermarkConfig) </h3>
+<p>说明：设置成功后对所有窗口生效.<br>
+参数：</p>
+<table>
+<thead>
+<tr>
+<th>参数名</th>
+<th>类型</th>
+<th>说明</th>
+<th>必需</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>watermarkConfig</td>
+<td>Object</td>
+<td>水印样式配置<br>默认值：{<br>&nbsp;&nbsp;&nbsp;&nbsp;text: 'h5player',<br>&nbsp;&nbsp;&nbsp;&nbsp;color: 'rgba(255, 255, 255, 0.5)',<br>&nbsp;&nbsp;&nbsp;&nbsp;font: '24px 微软雅黑',<br>&nbsp;&nbsp;&nbsp;&nbsp;rotateDegree: -15,<br>&nbsp;&nbsp;&nbsp;&nbsp;space: 240<br>}</td>
+<td>是</td>
+</tr>
+<tr>
+<td>-text</td>
+<td>String</td>
+<td>文本</td>
+<td>是</td>
+</tr>
+<tr>
+<td>-color</td>
+<td>String</td>
+<td>颜色，<a target="_blank" href="https://developer.mozilla.org/zh-CN/docs/Web/CSS/color">css-color</a></td>
+<td>否</td>
+</tr>
+<tr>
+<td>-font</td>
+<td>String</td>
+<td>字体，<a target="_blank" href="https://developer.mozilla.org/zh-CN/docs/Web/CSS/font">css-font</a></td>
+<td>否</td>
+</tr>
+<tr>
+<td>-rotateDegree</td>
+<td>Number</td>
+<td>角度，-180°~180°,负值向上旋转，正值向下旋转</td>
+<td>否</td>
+</tr>
+<tr>
+<td>-space</td>
+<td>Number</td>
+<td>间隔，单位px</td>
+<td>否</td>
+</tr>
+</tbody>
+</table>
+<p>返回：Promise</p>
+<pre data-role="codeBlock" data-info="js" class="language-javascript js"><code>myPlugin<span class="token punctuation">.</span><span class="token method function property-access"><span class="token maybe-class-name">JS_SetWatermarkConfig</span></span><span class="token punctuation">(</span><span class="token punctuation">{</span>
+    <span class="token literal-property property">text</span><span class="token operator">:</span> <span class="token string">'h5player'</span><span class="token punctuation">,</span>
+    <span class="token literal-property property">color</span><span class="token operator">:</span> <span class="token string">'rgba(255, 255, 255, 0.5)'</span><span class="token punctuation">,</span>
+    <span class="token literal-property property">font</span><span class="token operator">:</span> <span class="token string">'24px 微软雅黑'</span><span class="token punctuation">,</span>
+    <span class="token literal-property property">rotateDegree</span><span class="token operator">:</span> <span class="token operator">-</span><span class="token number">15</span><span class="token punctuation">,</span>
+    <span class="token literal-property property">space</span><span class="token operator">:</span> <span class="token number">240</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span>
+  <span class="token punctuation">.</span><span class="token method function property-access">then</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token arrow operator">=&gt;</span> <span class="token punctuation">{</span> <span class="token console class-name">console</span><span class="token punctuation">.</span><span class="token method function property-access">log</span><span class="token punctuation">(</span><span class="token string">'Success'</span><span class="token punctuation">)</span> <span class="token punctuation">}</span><span class="token punctuation">)</span>
+  <span class="token punctuation">.</span><span class="token keyword control-flow keyword-catch">catch</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token parameter">errCode</span><span class="token punctuation">)</span> <span class="token arrow operator">=&gt;</span> <span class="token punctuation">{</span> <span class="token console class-name">console</span><span class="token punctuation">.</span><span class="token method function property-access">error</span><span class="token punctuation">(</span><span class="token string">'Failed'</span><span class="token punctuation">,</span> errCode<span class="token punctuation">)</span> <span class="token punctuation">}</span><span class="token punctuation">)</span>
+<span class="token comment">// 然后调JS_CapturePicture接口抓取带有水印的图片</span>
+<span class="token comment">// 若抓取的图片没有水印，请检查参数是否符合规范</span>
+</code></pre><h3 id="取消设置抓图水印js_cancelwatermarkconfig">取消设置抓图水印：JS_CancelWatermarkConfig() </h3>
+<p>参数：无<br>
+返回：Promise</p>
+<pre data-role="codeBlock" data-info="js" class="language-javascript js"><code>myPlugin<span class="token punctuation">.</span><span class="token method function property-access"><span class="token maybe-class-name">JS_CancelWatermarkConfig</span></span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+  <span class="token punctuation">.</span><span class="token method function property-access">then</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token arrow operator">=&gt;</span> <span class="token punctuation">{</span> <span class="token console class-name">console</span><span class="token punctuation">.</span><span class="token method function property-access">log</span><span class="token punctuation">(</span><span class="token string">'Success'</span><span class="token punctuation">)</span> <span class="token punctuation">}</span><span class="token punctuation">)</span>
+  <span class="token punctuation">.</span><span class="token keyword control-flow keyword-catch">catch</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token parameter">errCode</span><span class="token punctuation">)</span> <span class="token arrow operator">=&gt;</span> <span class="token punctuation">{</span> <span class="token console class-name">console</span><span class="token punctuation">.</span><span class="token method function property-access">error</span><span class="token punctuation">(</span><span class="token string">'Failed'</span><span class="token punctuation">,</span> errCode<span class="token punctuation">)</span> <span class="token punctuation">}</span><span class="token punctuation">)</span>
+</code></pre><h2 id="错误码及其描述">错误码及其描述 </h2>
+<table>
+<thead>
+<tr>
+<th>错误码</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0x12f900001</td>
+<td>接口调用参数错误</td>
+</tr>
+<tr>
+<td>0x12f900002</td>
+<td>不在播放状态</td>
+</tr>
+<tr>
+<td>0x12f900003</td>
+<td>仅回放支持该功能</td>
+</tr>
+<tr>
+<td>0x12f900004</td>
+<td>普通模式不支持该功能</td>
+</tr>
+<tr>
+<td>0x12f900005</td>
+<td>高级模式不支持该功能</td>
+</tr>
+<tr>
+<td>0x12f900006</td>
+<td>高级模式的解码库加载失败</td>
+</tr>
+<tr>
+<td>0x12f900008</td>
+<td>url格式错误,传了null或者是非ws/wss的报错</td>
+</tr>
+<tr>
+<td>0x12f900009</td>
+<td>取流超时错误</td>
+</tr>
+<tr>
+<td>0x12f900010</td>
+<td>设置或者是获取音量失败，因为没有开启音频的窗口</td>
+</tr>
+<tr>
+<td>0x12f900011</td>
+<td>设置的音量不在1-100范围</td>
+</tr>
+<tr>
+<td>0x12f900012</td>
+<td>打开视频声音失败，需要等首帧显示后再开启声音,倍数情况不允许打开声音</td>
+</tr>
+<tr>
+<td>0x12f900013</td>
+<td>当前解码方式不支持回放优化功能，请采用https+设置跨域隔离+chrome94+进行支持</td>
+</tr>
+<tr>
+<td>0x12f900014</td>
+<td>糟糕的水印设置，单个水印内容已经溢出了图片范围</td>
+</tr>
+<tr>
+<td>0x12f910000</td>
+<td>websocket连接失败，请检查网络是否通畅，URL是否正确</td>
+</tr>
+<tr>
+<td>0x12f910010</td>
+<td>取流失败</td>
+</tr>
+<tr>
+<td>0x12f910011</td>
+<td>流中断，电脑配置过低，程序卡主线程都可能导致流中断</td>
+</tr>
+<tr>
+<td>0x12f910014</td>
+<td>没有音频数据</td>
+</tr>
+<tr>
+<td>0x12f910015</td>
+<td>未找到对应websocket，取流套接字被动关闭的报错</td>
+</tr>
+<tr>
+<td>0x12f910016</td>
+<td>websocket不在连接状态</td>
+</tr>
+<tr>
+<td>0x12f910017</td>
+<td>不支持智能信息展示</td>
+</tr>
+<tr>
+<td>0x12f910018</td>
+<td>websocket长时间未收到message</td>
+</tr>
+<tr>
+<td>0x12f910019</td>
+<td>wss连接失败，原因：端口尚未开通、证书未安装、证书不安全,安装平台登录页面根证书后重启浏览器解决</td>
+</tr>
+<tr>
+<td>0x12f910020</td>
+<td>单帧回放时不支持该操作</td>
+</tr>
+<tr>
+<td>0x12f910021</td>
+<td>已是最大倍速</td>
+</tr>
+<tr>
+<td>0x12f910022</td>
+<td>已是最小倍速</td>
+</tr>
+<tr>
+<td>0x12f910023</td>
+<td>ws/wss连接超时，默认6s超时时间，原因：网络异常，网络不通</td>
+</tr>
+<tr>
+<td>0x12f910026</td>
+<td>jsdecoder1.0解码报错视频编码格式不支持</td>
+</tr>
+<tr>
+<td>0x12f910027</td>
+<td>后端取流超时，主动关闭连接（设备突然离线或重启，网络传输超时20s）</td>
+</tr>
+<tr>
+<td>0x12f910028</td>
+<td>设置的缓冲区大小无效，大小0-5<em>1024</em>1024，不在该范围的报错</td>
+</tr>
+<tr>
+<td>0x12f910029</td>
+<td>普通模式的报错，码流异常导致黑屏,尝试重新取流</td>
+</tr>
+<tr>
+<td>0x12f910031</td>
+<td>普通模式下播放卡主会出现</td>
+</tr>
+<tr>
+<td>0x12f910032</td>
+<td>码流编码格式普通模式下不支持，可切换高级模式尝试播放</td>
+</tr>
+<tr>
+<td>0x12f910033</td>
+<td>码流编码格式非h264,h265;不支持该格式</td>
+</tr>
+<tr>
+<td>0x12f910034</td>
+<td>后台媒体不支持回放优化功能，请升级dac、sac、mgc、vod、vnsc、ncg至新的基线版本</td>
+</tr>
+<tr>
+<td>0x12f910035</td>
+<td>获取缩略图异常，请先调用开启缩略图再调用获取缩略图</td>
+</tr>
+<tr>
+<td>0x12f910036</td>
+<td>该场景不支持单帧功能</td>
+</tr>
+<tr>
+<td>0x12f910037</td>
+<td>倒放不支持该操作，例如:打开声音、紧急录像</td>
+</tr>
+<tr>
+<td>0x12f910038</td>
+<td>当前预览未设置开启即时回放，无法开始即时回放</td>
+</tr>
+<tr>
+<td>0x12f910039</td>
+<td>当前暂停状态，不支持该操作，例如:倍速</td>
+</tr>
+<tr>
+<td>0x12f910040</td>
+<td>三方接入设备不支持该操作。例如：大华和国标不支持倒放，单帧退</td>
+</tr>
+<tr>
+<td>0x12f910041</td>
+<td>即时回放失败，缓冲区无数据导致,建议等待2秒再进行即时回放</td>
+</tr>
+<tr>
+<td>0x12f920001</td>
+<td>文件录制失败，请重试（可能是时间太短导致，请&gt;2秒做紧急录像）</td>
+</tr>
+<tr>
+<td>0x12f920015</td>
+<td>未调用停止录像，再次调用开始录像</td>
+</tr>
+<tr>
+<td>0x12f920016</td>
+<td>未开启录像调用停止录像接口错误</td>
+</tr>
+<tr>
+<td>0x12f920017</td>
+<td>紧急录像目标格式不支持，非ps/mp4</td>
+</tr>
+<tr>
+<td>0x12f920018</td>
+<td>紧急录像文件名为null</td>
+</tr>
+<tr>
+<td>0x12f930010</td>
+<td>内存不足</td>
+</tr>
+<tr>
+<td>0x12f930011</td>
+<td>首帧显示之前无法抓图，请稍后重试</td>
+</tr>
+<tr>
+<td>0x12f950000</td>
+<td>采集音频失败，可能是在非https域下使用对讲导致</td>
+</tr>
+<tr>
+<td>0x12f950001</td>
+<td>对讲不支持这种音频编码格式</td>
+</tr>
+<tr>
+<td>0x12f950050</td>
+<td>操作失败，当前不在对讲状态</td>
+</tr>
+</tbody>
+</table>
+<h2 id="faq">FAQ </h2>
+<p>1.Q: 实测性能和给的性能数据不符，使用了chrome92版本，没有加跨域隔离导致<br>
+A: http头增加跨域隔离，Cross-Origin-Embedder-Policy: require-corp Cross-Origin-Opener-Policy: same-origin 并在https环境下使用。</p>
+
+      </div>
+      
+      
+    
+    
+    <script type="module">
+// TODO: If ZenUML gets integrated into mermaid in the future,
+//      we can remove the following lines.
+
+
+var MERMAID_CONFIG = ({"startOnLoad":false});
+if (typeof MERMAID_CONFIG !== 'undefined') {
+  MERMAID_CONFIG.startOnLoad = false
+  MERMAID_CONFIG.cloneCssStyles = false
+  MERMAID_CONFIG.theme = "default"
+}
+
+mermaid.initialize(MERMAID_CONFIG || {})
+if (typeof(window['Reveal']) !== 'undefined') {
+  function mermaidRevealHelper(event) {
+    var currentSlide = event.currentSlide
+    var diagrams = currentSlide.querySelectorAll('.mermaid')
+    for (var i = 0; i < diagrams.length; i++) {
+      var diagram = diagrams[i]
+      if (!diagram.hasAttribute('data-processed')) {
+        mermaid.init(null, diagram, ()=> {
+          Reveal.slide(event.indexh, event.indexv)
+        })
+      }
+    }
+  }
+  Reveal.addEventListener('slidetransitionend', mermaidRevealHelper)
+  Reveal.addEventListener('ready', mermaidRevealHelper)
+  await mermaid.run({
+    nodes: document.querySelectorAll('.mermaid')
+  })
+} else {
+  await mermaid.run({
+    nodes: document.querySelectorAll('.mermaid')
+  })
+}
+</script>
+    
+    
+    
+  
+    </body></html>
