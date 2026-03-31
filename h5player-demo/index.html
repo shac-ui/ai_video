@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>H5Player 视频监控播放器</title>
+  <link rel="stylesheet" href="player.css" />
+</head>
+<body>
+  <div class="app-wrapper">
+    <!-- 顶部导航栏 -->
+    <header class="top-bar">
+      <div class="logo">
+        <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+          <circle cx="14" cy="14" r="14" fill="#3b82f6"/>
+          <polygon points="11,9 21,14 11,19" fill="white"/>
+        </svg>
+        <span class="logo-text">H5Player</span>
+        <span class="version-badge">v2.5.1</span>
+      </div>
+      <nav class="top-nav">
+        <button class="nav-btn active" data-mode="preview">实时预览</button>
+        <button class="nav-btn" data-mode="playback">录像回放</button>
+      </nav>
+      <div class="top-actions">
+        <button class="icon-btn" id="btn-split-1" title="1×1分屏" data-split="1">
+          <svg width="16" height="16" viewBox="0 0 16 16"><rect x="1" y="1" width="14" height="14" rx="1" stroke="currentColor" stroke-width="1.5" fill="none"/></svg>
+        </button>
+        <button class="icon-btn" id="btn-split-2" title="2×2分屏" data-split="2">
+          <svg width="16" height="16" viewBox="0 0 16 16"><rect x="1" y="1" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.5" fill="none"/><rect x="9" y="1" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.5" fill="none"/><rect x="1" y="9" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.5" fill="none"/><rect x="9" y="9" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.5" fill="none"/></svg>
+        </button>
+        <button class="icon-btn" id="btn-split-3" title="3×3分屏" data-split="3">
+          <svg width="16" height="16" viewBox="0 0 16 16"><rect x="1" y="1" width="4" height="4" rx="0.5" stroke="currentColor" stroke-width="1.5" fill="none"/><rect x="6" y="1" width="4" height="4" rx="0.5" stroke="currentColor" stroke-width="1.5" fill="none"/><rect x="11" y="1" width="4" height="4" rx="0.5" stroke="currentColor" stroke-width="1.5" fill="none"/><rect x="1" y="6" width="4" height="4" rx="0.5" stroke="currentColor" stroke-width="1.5" fill="none"/><rect x="6" y="6" width="4" height="4" rx="0.5" stroke="currentColor" stroke-width="1.5" fill="none"/><rect x="11" y="6" width="4" height="4" rx="0.5" stroke="currentColor" stroke-width="1.5" fill="none"/><rect x="1" y="11" width="4" height="4" rx="0.5" stroke="currentColor" stroke-width="1.5" fill="none"/><rect x="6" y="11" width="4" height="4" rx="0.5" stroke="currentColor" stroke-width="1.5" fill="none"/><rect x="11" y="11" width="4" height="4" rx="0.5" stroke="currentColor" stroke-width="1.5" fill="none"/></svg>
+        </button>
+        <button class="icon-btn" id="btn-fullscreen" title="全屏">
+          <svg width="16" height="16" viewBox="0 0 16 16"><path d="M1 6V1h5M15 6V1h-5M1 10v5h5M15 10v5h-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" fill="none"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <div class="main-layout">
+      <!-- 左侧配置面板 -->
+      <aside class="sidebar">
+        <!-- 流媒体URL配置 -->
+        <section class="panel-section">
+          <h3 class="section-title">
+            <svg width="14" height="14" viewBox="0 0 14 14"><path d="M7 1l1.5 3h3.5l-2.8 2 1.1 3.3L7 7.5l-3.3 1.8L4.8 6 2 4h3.5z" fill="currentColor"/></svg>
+            流媒体配置
+          </h3>
+          <div class="form-group">
+            <label>视频流 URL</label>
+            <div class="input-row">
+              <input type="text" id="stream-url" class="form-input" placeholder="wss://host:port/stream/..." />
+            </div>
+          </div>
+          <div class="form-group">
+            <label>解码模式</label>
+            <div class="radio-group">
+              <label class="radio-label">
+                <input type="radio" name="decode-mode" value="0" checked /> 普通模式
+              </label>
+              <label class="radio-label">
+                <input type="radio" name="decode-mode" value="1" /> 高级模式
+              </label>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>安全Token（可选）</label>
+            <input type="text" id="auth-token" class="form-input" placeholder="安全认证Token" />
+          </div>
+          <button class="btn-primary full-width" id="btn-play">
+            <svg width="14" height="14" viewBox="0 0 14 14"><polygon points="3,2 12,7 3,12" fill="currentColor"/></svg>
+            开始播放
+          </button>
+          <button class="btn-danger full-width mt-8" id="btn-stop">
+            <svg width="14" height="14" viewBox="0 0 14 14"><rect x="2" y="2" width="10" height="10" rx="1" fill="currentColor"/></svg>
+            停止播放
+          </button>
+        </section>
+
+        <!-- 回放配置（默认隐藏） -->
+        <section class="panel-section" id="playback-config" style="display:none">
+          <h3 class="section-title">
+            <svg width="14" height="14" viewBox="0 0 14 14"><circle cx="7" cy="7" r="6" stroke="currentColor" stroke-width="1.5" fill="none"/><path d="M7 4v3l2 2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" fill="none"/></svg>
+            回放时间段
+          </h3>
+          <div class="form-group">
+            <label>开始时间</label>
+            <input type="datetime-local" id="start-time" class="form-input" />
+          </div>
+          <div class="form-group">
+            <label>结束时间</label>
+            <input type="datetime-local" id="end-time" class="form-input" />
+          </div>
+          <div class="form-group">
+            <label>回放方向</label>
+            <div class="radio-group">
+              <label class="radio-label">
+                <input type="radio" name="playback-mode" value="1" checked /> 正向播放
+              </label>
+              <label class="radio-label">
+                <input type="radio" name="playback-mode" value="3" /> 倒向播放
+              </label>
+            </div>
+          </div>
+        </section>
+
+        <!-- 音量控制 -->
+        <section class="panel-section">
+          <h3 class="section-title">
+            <svg width="14" height="14" viewBox="0 0 14 14"><path d="M2 5h3l4-3v10l-4-3H2V5z" fill="currentColor"/><path d="M10 5a3 3 0 010 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" fill="none"/></svg>
+            音量控制
+          </h3>
+          <div class="volume-row">
+            <button class="icon-btn sm" id="btn-mute" title="静音">
+              <svg id="icon-sound-on" width="16" height="16" viewBox="0 0 16 16"><path d="M3 6H6L10 3V13L6 10H3V6Z" fill="currentColor"/><path d="M12 5A4 4 0 0112 11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" fill="none"/></svg>
+              <svg id="icon-sound-off" width="16" height="16" viewBox="0 0 16 16" style="display:none"><path d="M3 6H6L10 3V13L6 10H3V6Z" fill="currentColor"/><line x1="12" y1="5" x2="16" y2="11" stroke="currentColor" stroke-width="1.5"/><line x1="16" y1="5" x2="12" y2="11" stroke="currentColor" stroke-width="1.5"/></svg>
+            </button>
+            <input type="range" id="volume-slider" class="slider" min="1" max="100" value="50" />
+            <span class="volume-value" id="volume-display">50</span>
+          </div>
+          <div class="btn-group mt-8">
+            <button class="btn-outline sm" id="btn-open-sound">开启声音</button>
+            <button class="btn-outline sm" id="btn-close-sound">关闭声音</button>
+          </div>
+        </section>
+
+        <!-- 回放控制（默认隐藏） -->
+        <section class="panel-section" id="playback-controls" style="display:none">
+          <h3 class="section-title">
+            <svg width="14" height="14" viewBox="0 0 14 14"><polygon points="3,2 10,7 3,12" fill="currentColor"/><rect x="10" y="2" width="2" height="10" fill="currentColor"/></svg>
+            回放控制
+          </h3>
+          <div class="btn-group">
+            <button class="icon-btn sm" id="btn-pause" title="暂停">
+              <svg width="16" height="16" viewBox="0 0 16 16"><rect x="3" y="2" width="4" height="12" rx="1" fill="currentColor"/><rect x="9" y="2" width="4" height="12" rx="1" fill="currentColor"/></svg>
+            </button>
+            <button class="icon-btn sm" id="btn-resume" title="继续">
+              <svg width="16" height="16" viewBox="0 0 16 16"><polygon points="4,2 13,8 4,14" fill="currentColor"/></svg>
+            </button>
+            <button class="icon-btn sm" id="btn-frame-back" title="单帧退">
+              <svg width="16" height="16" viewBox="0 0 16 16"><polygon points="12,2 5,8 12,14" fill="currentColor"/><rect x="2" y="2" width="3" height="12" rx="1" fill="currentColor"/></svg>
+            </button>
+            <button class="icon-btn sm" id="btn-frame-forward" title="单帧进">
+              <svg width="16" height="16" viewBox="0 0 16 16"><polygon points="4,2 11,8 4,14" fill="currentColor"/><rect x="11" y="2" width="3" height="12" rx="1" fill="currentColor"/></svg>
+            </button>
+          </div>
+          <div class="form-group mt-8">
+            <label>播放速率</label>
+            <div class="btn-group">
+              <button class="btn-outline xs speed-btn" data-rate="-8">⅛x</button>
+              <button class="btn-outline xs speed-btn" data-rate="-4">¼x</button>
+              <button class="btn-outline xs speed-btn" data-rate="-2">½x</button>
+              <button class="btn-outline xs speed-btn active" data-rate="1">1x</button>
+              <button class="btn-outline xs speed-btn" data-rate="2">2x</button>
+              <button class="btn-outline xs speed-btn" data-rate="4">4x</button>
+              <button class="btn-outline xs speed-btn" data-rate="8">8x</button>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>快速跳转</label>
+            <div class="btn-group">
+              <button class="btn-outline sm" id="btn-slow">慢放</button>
+              <button class="btn-outline sm" id="btn-fast">快放</button>
+              <button class="btn-outline sm" id="btn-change-mode">正/倒放</button>
+            </div>
+          </div>
+        </section>
+
+        <!-- 对讲功能 -->
+        <section class="panel-section" id="talk-section">
+          <h3 class="section-title">
+            <svg width="14" height="14" viewBox="0 0 14 14"><path d="M7 1a3 3 0 013 3v3a3 3 0 01-6 0V4a3 3 0 013-3z" fill="currentColor"/><path d="M3 7a4 4 0 008 0M7 11v2M5 13h4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" fill="none"/></svg>
+            语音对讲
+          </h3>
+          <div class="form-group">
+            <label>对讲 URL</label>
+            <input type="text" id="talk-url" class="form-input" placeholder="wss://host:port/talk/..." />
+          </div>
+          <div class="btn-group">
+            <button class="btn-outline sm" id="btn-start-talk">开始对讲</button>
+            <button class="btn-outline sm" id="btn-stop-talk">停止对讲</button>
+          </div>
+          <div class="volume-row mt-8">
+            <span class="label-sm">对讲音量</span>
+            <input type="range" id="talk-volume-slider" class="slider" min="0" max="100" value="50" />
+            <span class="volume-value" id="talk-volume-display">50</span>
+          </div>
+        </section>
+      </aside>
+
+      <!-- 中间播放区域 -->
+      <main class="player-area">
+        <div id="play_window" class="player-container"></div>
+
+        <!-- 底部工具栏 -->
+        <div class="player-toolbar">
+          <div class="toolbar-left">
+            <button class="tool-btn" id="btn-capture" title="抓图">
+              <svg width="16" height="16" viewBox="0 0 16 16"><rect x="1" y="4" width="14" height="10" rx="2" stroke="currentColor" stroke-width="1.5" fill="none"/><circle cx="8" cy="9" r="2.5" stroke="currentColor" stroke-width="1.5" fill="none"/><path d="M5 4l1-2h4l1 2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" fill="none"/></svg>
+              抓图
+            </button>
+            <button class="tool-btn" id="btn-record-start" title="开始录像">
+              <svg width="16" height="16" viewBox="0 0 16 16"><circle cx="8" cy="8" r="4" fill="#ef4444"/><circle cx="8" cy="8" r="7" stroke="currentColor" stroke-width="1.5" fill="none"/></svg>
+              录像
+            </button>
+            <button class="tool-btn" id="btn-record-stop" title="停止录像" style="display:none">
+              <svg width="16" height="16" viewBox="0 0 16 16"><rect x="4" y="4" width="8" height="8" rx="1" fill="#ef4444"/><circle cx="8" cy="8" r="7" stroke="currentColor" stroke-width="1.5" fill="none"/></svg>
+              停止录像
+            </button>
+            <button class="tool-btn" id="btn-zoom" title="电子放大">
+              <svg width="16" height="16" viewBox="0 0 16 16"><circle cx="7" cy="7" r="5" stroke="currentColor" stroke-width="1.5" fill="none"/><line x1="11" y1="11" x2="15" y2="15" stroke="currentColor" stroke-width="1.5"/><line x1="7" y1="4" x2="7" y2="10" stroke="currentColor" stroke-width="1.5"/><line x1="4" y1="7" x2="10" y2="7" stroke="currentColor" stroke-width="1.5"/></svg>
+              电子放大
+            </button>
+            <button class="tool-btn" id="btn-rotate" title="旋转">
+              <svg width="16" height="16" viewBox="0 0 16 16"><path d="M3 8a5 5 0 109.9-1M13 4V7l-3-3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" fill="none"/></svg>
+              旋转
+            </button>
+          </div>
+          <div class="toolbar-right">
+            <div class="osd-time" id="osd-time-display">--:--:--</div>
+            <button class="tool-btn" id="btn-video-info" title="视频信息">
+              <svg width="16" height="16" viewBox="0 0 16 16"><circle cx="8" cy="8" r="7" stroke="currentColor" stroke-width="1.5" fill="none"/><path d="M8 7v5M8 5v1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" fill="none"/></svg>
+              信息
+            </button>
+            <button class="tool-btn" id="btn-fullscreen-single" title="单窗全屏">
+              <svg width="16" height="16" viewBox="0 0 16 16"><path d="M1 6V1h5M15 6V1h-5M1 10v5h5M15 10v5h-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" fill="none"/></svg>
+              全屏
+            </button>
+          </div>
+        </div>
+      </main>
+
+      <!-- 右侧状态面板 -->
+      <aside class="sidebar right-sidebar">
+        <!-- 视频信息 -->
+        <section class="panel-section">
+          <h3 class="section-title">
+            <svg width="14" height="14" viewBox="0 0 14 14"><path d="M1 3h12v8H1z" stroke="currentColor" stroke-width="1.5" fill="none" rx="1"/><path d="M9 6l3-2v6l-3-2V6z" fill="currentColor"/></svg>
+            视频信息
+          </h3>
+          <div class="info-grid">
+            <div class="info-item">
+              <span class="info-label">编码格式</span>
+              <span class="info-value" id="info-codec">--</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">分辨率</span>
+              <span class="info-value" id="info-resolution">--</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">帧率</span>
+              <span class="info-value" id="info-framerate">--</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">码率</span>
+              <span class="info-value" id="info-bitrate">--</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">音频格式</span>
+              <span class="info-value" id="info-audio">--</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">封装格式</span>
+              <span class="info-value" id="info-format">--</span>
+            </div>
+          </div>
+        </section>
+
+        <!-- 旋转缩放控制 -->
+        <section class="panel-section">
+          <h3 class="section-title">
+            <svg width="14" height="14" viewBox="0 0 14 14"><rect x="2" y="2" width="10" height="10" rx="1" stroke="currentColor" stroke-width="1.5" fill="none"/><path d="M5 5h4v4H5z" fill="currentColor"/></svg>
+            画面调整
+          </h3>
+          <div class="form-group">
+            <label>旋转角度</label>
+            <div class="btn-group">
+              <button class="btn-outline xs rotate-btn" data-degree="0">0°</button>
+              <button class="btn-outline xs rotate-btn" data-degree="90">90°</button>
+              <button class="btn-outline xs rotate-btn" data-degree="180">180°</button>
+              <button class="btn-outline xs rotate-btn" data-degree="270">270°</button>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>画面比例</label>
+            <select id="scale-ratio" class="form-input">
+              <option value="fill">铺满</option>
+              <option value="original">原始分辨率</option>
+              <option value="16:9">16:9</option>
+              <option value="4:3">4:3</option>
+              <option value="9:16">9:16</option>
+              <option value="3:4">3:4</option>
+            </select>
+          </div>
+          <button class="btn-outline sm full-width" id="btn-scale-cancel">还原画面</button>
+        </section>
+
+        <!-- 状态日志 -->
+        <section class="panel-section log-section">
+          <h3 class="section-title">
+            <svg width="14" height="14" viewBox="0 0 14 14"><path d="M2 3h10M2 6h8M2 9h6M2 12h4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" fill="none"/></svg>
+            状态日志
+            <button class="icon-btn xs float-right" id="btn-clear-log" title="清空日志">
+              <svg width="12" height="12" viewBox="0 0 12 12"><path d="M2 3h8l-1 7H3L2 3z" stroke="currentColor" stroke-width="1.2" fill="none"/><path d="M1 3h10M4 3V1h4v2" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" fill="none"/></svg>
+            </button>
+          </h3>
+          <div class="log-container" id="log-container"></div>
+        </section>
+      </aside>
+    </div>
+  </div>
+
+  <!-- 视频信息弹窗 -->
+  <div class="modal-overlay" id="video-info-modal" style="display:none">
+    <div class="modal">
+      <div class="modal-header">
+        <span>视频详细信息</span>
+        <button class="icon-btn" id="close-video-modal">
+          <svg width="16" height="16" viewBox="0 0 16 16"><line x1="3" y1="3" x2="13" y2="13" stroke="currentColor" stroke-width="2"/><line x1="13" y1="3" x2="3" y2="13" stroke="currentColor" stroke-width="2"/></svg>
+        </button>
+      </div>
+      <div class="modal-body" id="modal-video-info"></div>
+    </div>
+  </div>
+
+  <!-- Toast 通知 -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <script src="player.js"></script>
+</body>
+</html>
