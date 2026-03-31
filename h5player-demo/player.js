@@ -1,660 +1,790 @@
 /**
  * H5Player 播放器 UI 控制器
- * 基于 JSPlugin (h5player v2.5.1) API 封装
- * 文档参考: H5player2.5.1_开发指南
+ * 对接 JSPlugin (h5player v2.5.1) API
+ *
+ * 关键修正（对照官方 demo.html）：
+ * 1. szBasePath 指向实际 h5player.min.js 所在目录 "../h5player/demo"
+ * 2. 用 player.currentWindowIndex 替代手动维护 curIndex
+ * 3. 回放时间格式统一为 "YYYY-MM-DDTHH:mm:ss.000+08:00"
+ * 4. JS_Stop/JS_Fast/JS_Slow/JS_Resume 不传参数（自动用 currentWindowIndex）
+ * 5. 补全 StreamHeadChanged / ElementChanged 回调
+ * 6. 补全即时回放、缩略图、水印、智能信息、对讲录音功能
  */
 
 (function () {
   'use strict';
 
-  // ===== 状态管理 =====
+  // ===== 全局状态 =====
   const state = {
-    plugin: null,
-    curIndex: 0,
-    mode: 'preview',       // 'preview' | 'playback'
+    player: null,
+    mode: 'preview',        // 'preview' | 'playback'
+    decodeMode: 0,          // 0=普通 1=高级
     soundOpen: false,
     recording: false,
     zoomEnabled: false,
-    isFullscreen: false,
-    currentSplit: 1,
-    currentSpeed: 1,
-    currentRotation: 0,
-    osdTimer: null,
+    currentRate: 1,
   };
 
-  // ===== DOM 引用 =====
+  // ===== DOM 工具 =====
   const $ = (id) => document.getElementById(id);
   const $$ = (sel) => document.querySelectorAll(sel);
 
-  // ===== 日志工具 =====
+  // ===== 日志 =====
   function log(msg, type = 'default') {
-    const container = $('log-container');
-    if (!container) return;
+    const c = $('log-container');
+    if (!c) return;
     const now = new Date();
-    const time = `${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
-    const entry = document.createElement('div');
-    entry.className = `log-entry ${type}`;
-    entry.innerHTML = `<span class="log-time">${time}</span><span class="log-msg">${escapeHtml(msg)}</span>`;
-    container.appendChild(entry);
-    container.scrollTop = container.scrollHeight;
+    const t = `${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
+    const el = document.createElement('div');
+    el.className = `log-entry ${type}`;
+    el.innerHTML = `<span class="log-time">${t}</span><span class="log-msg">${esc(msg)}</span>`;
+    c.appendChild(el);
+    c.scrollTop = c.scrollHeight;
   }
 
   function pad(n) { return String(n).padStart(2, '0'); }
-  function escapeHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+  function esc(s) {
+    return String(s)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;');
+  }
 
-  // ===== Toast 通知 =====
+  // ===== Toast =====
   function toast(msg, type = 'info') {
-    const container = $('toast-container');
+    const c = $('toast-container');
     const el = document.createElement('div');
     el.className = `toast ${type}`;
     el.textContent = msg;
-    container.appendChild(el);
+    c.appendChild(el);
     setTimeout(() => {
       el.classList.add('hiding');
-      setTimeout(() => el.remove(), 200);
+      setTimeout(() => el.remove(), 220);
     }, 3000);
   }
 
-  // ===== 初始化 JSPlugin =====
-  function initPlugin() {
+  // ===== 时间格式转换 =====
+  // datetime-local 值: "2023-08-16T00:00:00" → "2023-08-16T00:00:00.000+08:00"
+  function toPlaybackTime(localStr) {
+    if (!localStr) return undefined;
+    const clean = localStr.replace(/\.\d+$/, '');           // 去掉已有毫秒
+    return clean + '.000+08:00';
+  }
+
+  function formatTs(d) {
+    return `${d.getFullYear()}${pad(d.getMonth() + 1)}${pad(d.getDate())}`
+      + `_${pad(d.getHours())}${pad(d.getMinutes())}${pad(d.getSeconds())}`;
+  }
+
+  // ===== 创建/初始化播放器 =====
+  function createPlayer() {
     if (typeof JSPlugin === 'undefined') {
-      log('警告: 未检测到 h5player.min.js，运行演示模式', 'warning');
-      toast('未加载 h5player.min.js，进入演示模式', 'warning');
-      initDemoMode();
+      log('未找到 h5player.min.js，请确认引入路径', 'error');
+      toast('未找到 h5player.min.js', 'error');
+      showDemoPlaceholder();
       return;
     }
 
-    try {
-      state.plugin = new JSPlugin({
-        szId: 'play_window',
-        szBasePath: './dist',
-        mseWorkerEnable: false,
-        bSupporDoubleClickFull: true,
-        iMaxSplit: 4,
-        iCurrentSplit: 1,
+    state.player = new JSPlugin({
+      szId: 'player',
+      // 必须与 h5player.min.js 所在目录一致
+      szBasePath: '../h5player/demo',
+      iMaxSplit: 4,
+      iCurrentSplit: 1,
+      openDebug: false,
+      mseWorkerEnable: false,
+      bSupporDoubleClickFull: true,
+      oStyle: {
+        borderSelect: '#FFCC00',
+      },
+    });
+
+    state.player.JS_SetWindowControlCallback({
+      windowEventSelect: function (iWndIndex) {
+        log(`选中窗口: ${iWndIndex}`, 'info');
+      },
+      pluginErrorHandler: function (iWndIndex, iErrorCode, oError) {
+        const hex = '0x' + Number(iErrorCode).toString(16).toUpperCase();
+        const desc = oError && oError.info ? oError.info : '';
+        log(`窗口[${iWndIndex}] 错误 ${hex} ${desc}`, 'error');
+        toast(`播放错误 ${hex}`, 'error');
+      },
+      windowEventOver: function () {},
+      windowEventOut: function () {},
+      windowEventUp: function () {},
+      windowFullCcreenChange: function (bFull) {
+        log(`全屏: ${bFull ? '开' : '关'}`, 'info');
+      },
+      firstFrameDisplay: function (iWndIndex, iWidth, iHeight) {
+        log(`首帧 窗口[${iWndIndex}] ${iWidth}×${iHeight}`, 'success');
+        fetchVideoInfo();
+        startOSDPoll();
+      },
+      performanceLack: function () {
+        log('性能不足，可能影响播放', 'warning');
+        toast('性能不足', 'warning');
+      },
+      StreamEnd: function (iWndIndex) {
+        log(`回放结束 窗口[${iWndIndex}]`, 'info');
+        toast(`窗口[${iWndIndex}] 回放结束`, 'info');
+        stopOSDPoll();
+      },
+      StreamHeadChanged: function (iWndIndex) {
+        log(`流头变更 窗口[${iWndIndex}]`, 'info');
+        fetchVideoInfo();
+      },
+      ThumbnailsEvent: function (iWndIndex, eventType, eventCode) {
+        log(`缩略图事件 窗口[${iWndIndex}] type:${eventType} code:${eventCode}`, 'info');
+      },
+      InterruptStream: function (iWndIndex, iTime) {
+        log(`断流 窗口[${iWndIndex}] ${iTime}s`, 'warning');
+      },
+      ElementChanged: function (iWndIndex, szElementType) {
+        log(`渲染元素 窗口[${iWndIndex}] → ${szElementType}`, 'info');
+      },
+    }).then(() => {
+      log('JSPlugin 初始化成功', 'success');
+      // 监听窗口大小变化自动 resize
+      window.addEventListener('resize', () => {
+        state.player && state.player.JS_Resize();
       });
-
-      state.plugin.JS_SetWindowControlCallback({
-        windowEventSelect: function (index) {
-          state.curIndex = index;
-          log(`切换窗口: ${index}`, 'info');
-        },
-        pluginErrorHandler: function (index, iErrorCode, oError) {
-          const msg = `窗口[${index}] 错误 0x${iErrorCode.toString(16).toUpperCase()}: ${oError?.info || '未知错误'}`;
-          log(msg, 'error');
-          toast(msg, 'error');
-        },
-        windowEventOver: function (index) {},
-        windowEventOut: function (index) {},
-        windowEventUp: function (index) {},
-        windowFullCcreenChange: function (bFull) {
-          state.isFullscreen = bFull;
-          log(`全屏状态: ${bFull ? '开启' : '关闭'}`, 'info');
-        },
-        firstFrameDisplay: function (index, iWidth, iHeight) {
-          log(`窗口[${index}] 首帧显示: ${iWidth}x${iHeight}`, 'success');
-          refreshVideoInfo();
-          startOSDPolling();
-        },
-        performanceLack: function () {
-          log('警告: 性能不足，可能影响播放质量', 'warning');
-          toast('性能不足，建议关闭其他程序', 'warning');
-        },
-        StreamEnd: function (index) {
-          log(`窗口[${index}] 回放结束`, 'info');
-          toast(`窗口[${index}] 回放结束`, 'info');
-        },
-        InterruptStream: function (iWndIndex, interruptTime) {
-          log(`窗口[${iWndIndex}] 断流: ${interruptTime}s`, 'warning');
-        },
-        talkPluginErrorHandler: function (iErrorCode, oErrorInfo) {
-          log(`对讲错误 0x${iErrorCode.toString(16).toUpperCase()}`, 'error');
-        },
-        ThumbnailsEvent: function (iWndIndex, eventType, eventCode) {
-          log(`缩略图事件 窗口[${iWndIndex}] type:${eventType} code:${eventCode}`, 'info');
-        },
-      }).then(() => {
-        log('JSPlugin 初始化成功', 'success');
-        toast('播放器初始化成功', 'success');
-      }).catch((err) => {
-        log(`JSPlugin 初始化失败: ${err}`, 'error');
-        toast('播放器初始化失败', 'error');
-      });
-    } catch (e) {
-      log(`初始化异常: ${e.message}`, 'error');
-    }
-  }
-
-  // ===== 演示模式（无实际播放器时展示UI）=====
-  function initDemoMode() {
-    const container = $('play_window');
-    if (!container) return;
-    container.style.cssText = 'display:flex;align-items:center;justify-content:center;flex-direction:column;gap:16px;background:#000;color:#64748b;';
-    container.innerHTML = `
-      <svg width="64" height="64" viewBox="0 0 64 64" fill="none">
-        <circle cx="32" cy="32" r="30" stroke="#2d4060" stroke-width="2"/>
-        <polygon points="24,20 48,32 24,44" fill="#3b82f6" opacity="0.5"/>
-      </svg>
-      <div style="font-size:14px;color:#94a3b8">演示模式 · 请配置流媒体URL后播放</div>
-      <div style="font-size:11px;color:#475569">需引入 h5player.min.js 以启用实际播放功能</div>
-    `;
-  }
-
-  // ===== 播放控制 =====
-  function handlePlay() {
-    if (!state.plugin) { toast('播放器未就绪', 'warning'); return; }
-    const url = $('stream-url').value.trim();
-    if (!url) { toast('请输入视频流URL', 'warning'); return; }
-
-    const mode = parseInt(document.querySelector('input[name="decode-mode"]:checked').value);
-    const token = $('auth-token').value.trim();
-    const config = {
-      playURL: url,
-      mode: mode,
-    };
-    if (token) config.token = token;
-
-    let startTime, endTime;
-    if (state.mode === 'playback') {
-      startTime = $('start-time').value;
-      endTime = $('end-time').value;
-      if (!startTime || !endTime) { toast('请选择回放时间段', 'warning'); return; }
-      config.PlayBackMode = parseInt(document.querySelector('input[name="playback-mode"]:checked').value);
-      startTime = toISO(startTime);
-      endTime = toISO(endTime);
-    }
-
-    log(`开始${state.mode === 'playback' ? '回放' : '预览'}: ${url}`, 'info');
-
-    state.plugin.JS_Play(url, config, state.curIndex, startTime, endTime)
-      .then(() => {
-        log('播放成功', 'success');
-        toast('播放成功', 'success');
-      })
-      .catch((err) => {
-        log(`播放失败: ${JSON.stringify(err)}`, 'error');
-        toast('播放失败，请检查URL和网络', 'error');
-      });
-  }
-
-  function handleStop() {
-    if (!state.plugin) return;
-    state.plugin.JS_Stop(state.curIndex)
-      .then(() => {
-        log('停止播放成功', 'success');
-        stopOSDPolling();
-        resetVideoInfo();
-      })
-      .catch((err) => log(`停止失败: ${err}`, 'error'));
-  }
-
-  // ===== 音量控制 =====
-  function handleOpenSound() {
-    if (!state.plugin) return;
-    state.plugin.JS_OpenSound(state.curIndex)
-      .then(() => {
-        state.soundOpen = true;
-        updateSoundIcon();
-        log('声音已开启', 'success');
-      })
-      .catch((err) => {
-        log(`开启声音失败: 0x${err?.errorCode?.toString(16) || err}`, 'error');
-        toast('开启声音失败，请等首帧显示后再试', 'error');
-      });
-  }
-
-  function handleCloseSound() {
-    if (!state.plugin) return;
-    state.plugin.JS_CloseSound(state.curIndex)
-      .then(() => {
-        state.soundOpen = false;
-        updateSoundIcon();
-        log('声音已关闭', 'info');
-      })
-      .catch((err) => log(`关闭声音失败: ${err}`, 'error'));
-  }
-
-  function handleVolumeChange(value) {
-    if (!state.plugin) return;
-    $('volume-display').textContent = value;
-    state.plugin.JS_SetVolume(state.curIndex, parseInt(value))
-      .catch((err) => log(`设置音量失败: ${err}`, 'error'));
-  }
-
-  function updateSoundIcon() {
-    $('icon-sound-on').style.display = state.soundOpen ? '' : 'none';
-    $('icon-sound-off').style.display = state.soundOpen ? 'none' : '';
-  }
-
-  // ===== 录像 =====
-  function handleRecordStart() {
-    if (!state.plugin) return;
-    const ts = formatTimestamp(new Date());
-    const fileName = `record_${ts}.mp4`;
-    state.plugin.JS_StartSaveEx(state.curIndex, fileName, 5)
-      .then(() => {
-        state.recording = true;
-        $('btn-record-start').style.display = 'none';
-        $('btn-record-stop').style.display = '';
-        $('btn-record-stop').classList.add('recording');
-        log(`开始录像: ${fileName}`, 'success');
-        toast('录像已开始', 'success');
-      })
-      .catch((err) => {
-        log(`开始录像失败: 0x${err?.errorCode?.toString(16) || err}`, 'error');
-        toast('录像失败，请先播放视频', 'error');
-      });
-  }
-
-  function handleRecordStop() {
-    if (!state.plugin) return;
-    state.plugin.JS_StopSave(state.curIndex)
-      .then(() => {
-        state.recording = false;
-        $('btn-record-start').style.display = '';
-        $('btn-record-stop').style.display = 'none';
-        $('btn-record-stop').classList.remove('recording');
-        log('录像已保存', 'success');
-        toast('录像已保存到本地', 'success');
-      })
-      .catch((err) => log(`停止录像失败: ${err}`, 'error'));
-  }
-
-  // ===== 抓图 =====
-  function handleCapture() {
-    if (!state.plugin) return;
-    const ts = formatTimestamp(new Date());
-    const fileName = `capture_${ts}`;
-    state.plugin.JS_CapturePicture(state.curIndex, fileName, 'JPEG')
-      .then(() => {
-        log(`截图已保存: ${fileName}.jpg`, 'success');
-        toast('截图已保存到本地', 'success');
-      })
-      .catch((err) => {
-        log(`截图失败: 0x${err?.errorCode?.toString(16) || err}`, 'error');
-        toast('截图失败，请等视频播放后重试', 'error');
-      });
-  }
-
-  // ===== 回放控制 =====
-  function handlePause() {
-    if (!state.plugin) return;
-    state.plugin.JS_Pause(state.curIndex)
-      .then(() => log('回放已暂停', 'info'))
-      .catch((err) => log(`暂停失败: ${err}`, 'error'));
-  }
-
-  function handleResume() {
-    if (!state.plugin) return;
-    state.plugin.JS_Resume(state.curIndex)
-      .then(() => log('回放已恢复', 'info'))
-      .catch((err) => log(`恢复失败: ${err}`, 'error'));
-  }
-
-  function handleFrameForward() {
-    if (!state.plugin) return;
-    state.plugin.JS_FrameForward(state.curIndex)
-      .then(() => log('单帧进', 'info'))
-      .catch((err) => log(`单帧进失败: 0x${err?.errorCode?.toString(16) || err}`, 'error'));
-  }
-
-  function handleFrameBack() {
-    if (!state.plugin) return;
-    state.plugin.JS_FrameBack(state.curIndex)
-      .then(() => log('单帧退', 'info'))
-      .catch((err) => log(`单帧退失败: 0x${err?.errorCode?.toString(16) || err}`, 'error'));
-  }
-
-  function handleFast() {
-    if (!state.plugin) return;
-    state.plugin.JS_Fast(state.curIndex)
-      .then((rate) => {
-        log(`快放 x${rate}`, 'info');
-        state.currentSpeed = rate;
-        updateSpeedUI(rate);
-      })
-      .catch((err) => {
-        if (err?.errorCode === 0x12f910021) toast('已达最大倍速', 'warning');
-        else log(`快放失败: ${err}`, 'error');
-      });
-  }
-
-  function handleSlow() {
-    if (!state.plugin) return;
-    state.plugin.JS_Slow(state.curIndex)
-      .then((rate) => {
-        log(`慢放 x${rate}`, 'info');
-        state.currentSpeed = rate;
-        updateSpeedUI(rate);
-      })
-      .catch((err) => {
-        if (err?.errorCode === 0x12f910022) toast('已达最小倍速', 'warning');
-        else log(`慢放失败: ${err}`, 'error');
-      });
-  }
-
-  function handleSpeed(rate) {
-    if (!state.plugin) return;
-    state.plugin.JS_Speed(state.curIndex, rate)
-      .then((actualRate) => {
-        log(`速率设置: ${actualRate}x`, 'info');
-        state.currentSpeed = actualRate;
-        updateSpeedUI(actualRate);
-      })
-      .catch((err) => log(`速率设置失败: ${err}`, 'error'));
-  }
-
-  function handleChangeMode() {
-    if (!state.plugin) return;
-    state.plugin.JS_ChangeMode(state.curIndex)
-      .then(() => log('正/倒放切换成功', 'info'))
-      .catch((err) => log(`正/倒放切换失败: ${err}`, 'error'));
-  }
-
-  function updateSpeedUI(rate) {
-    $$('.speed-btn').forEach(btn => {
-      btn.classList.toggle('active', parseInt(btn.dataset.rate) === rate);
+    }).catch((e) => {
+      log(`JSPlugin 初始化失败: ${e}`, 'error');
     });
   }
 
-  // ===== 电子放大 =====
-  function handleZoomToggle() {
-    if (!state.plugin) return;
-    if (state.zoomEnabled) {
-      state.plugin.JS_DisableZoom(state.curIndex)
-        .then(() => {
-          state.zoomEnabled = false;
-          $('btn-zoom').classList.remove('active');
-          log('电子放大已关闭', 'info');
-        })
-        .catch((err) => log(`关闭电子放大失败: ${err}`, 'error'));
-    } else {
-      state.plugin.JS_EnableZoom(state.curIndex)
-        .then(() => {
-          state.zoomEnabled = true;
-          $('btn-zoom').classList.add('active');
-          log('电子放大已开启', 'info');
-        })
-        .catch((err) => log(`开启电子放大失败: ${err}`, 'error'));
-    }
-  }
-
-  // ===== 旋转 =====
-  function handleRotate(degree) {
-    if (!state.plugin) return;
-    state.plugin.JS_Rotate(state.curIndex, degree)
-      .then(() => {
-        state.currentRotation = degree;
-        $$('.rotate-btn').forEach(btn => {
-          btn.classList.toggle('active', parseInt(btn.dataset.degree) === degree);
-        });
-        log(`旋转: ${degree}°`, 'info');
-      })
-      .catch((err) => log(`旋转失败: ${err}`, 'error'));
-  }
-
-  // ===== 缩放 =====
-  function handleScale(ratio) {
-    if (!state.plugin) return;
-    state.plugin.JS_Scale(state.curIndex, ratio)
-      .then(() => log(`缩放比例: ${ratio}`, 'info'))
-      .catch((err) => log(`缩放失败: ${err}`, 'error'));
-  }
-
-  function handleScaleCancel() {
-    if (!state.plugin) return;
-    state.plugin.JS_ScaleCancel(state.curIndex)
-      .then(() => {
-        log('已还原画面', 'info');
-        $('scale-ratio').value = 'fill';
-        $$('.rotate-btn').forEach(btn => btn.classList.remove('active'));
-        $$('.rotate-btn[data-degree="0"]').forEach(btn => btn.classList.add('active'));
-      })
-      .catch((err) => log(`还原失败: ${err}`, 'error'));
-  }
-
-  // ===== 分屏 =====
-  function handleSplit(splitNum) {
-    if (!state.plugin) return;
-    state.plugin.JS_ArrangeWindow(splitNum)
-      .then(() => {
-        state.currentSplit = splitNum;
-        $$('[data-split]').forEach(btn => {
-          btn.classList.toggle('active', parseInt(btn.dataset.split) === splitNum);
-        });
-        log(`分屏: ${splitNum}x${splitNum}`, 'info');
-      })
-      .catch((err) => log(`分屏失败: ${err}`, 'error'));
-  }
-
-  // ===== 全屏 =====
-  function handleFullscreen() {
-    if (!state.plugin) return;
-    const next = !state.isFullscreen;
-    state.plugin.JS_FullScreenDisplay(next)
-      .then(() => {
-        state.isFullscreen = next;
-        log(`全屏: ${next ? '开启' : '关闭'}`, 'info');
-      })
-      .catch((err) => log(`全屏失败: ${err}`, 'error'));
-  }
-
-  function handleFullscreenSingle() {
-    if (!state.plugin) return;
-    state.plugin.JS_FullScreenSingle(state.curIndex)
-      .then(() => log(`窗口[${state.curIndex}] 单窗全屏`, 'info'))
-      .catch((err) => log(`单窗全屏失败: ${err}`, 'error'));
-  }
-
-  // ===== 对讲 =====
-  function handleStartTalk() {
-    if (!state.plugin) return;
-    const url = $('talk-url').value.trim();
-    if (!url) { toast('请输入对讲URL', 'warning'); return; }
-    const token = $('auth-token').value.trim();
-    const param = token ? { token } : {};
-    state.plugin.JS_StartTalk(url, param)
-      .then(() => {
-        log('对讲已开启', 'success');
-        toast('对讲已开启', 'success');
-        $('btn-start-talk').classList.add('active');
-      })
-      .catch((err) => {
-        log(`开启对讲失败: 0x${err?.errorCode?.toString(16) || err}`, 'error');
-        toast('对讲需在 HTTPS 环境下使用', 'error');
-      });
-  }
-
-  function handleStopTalk() {
-    if (!state.plugin) return;
-    state.plugin.JS_StopTalk()
-      .then(() => {
-        log('对讲已停止', 'info');
-        $('btn-start-talk').classList.remove('active');
-      })
-      .catch((err) => log(`停止对讲失败: ${err}`, 'error'));
-  }
-
-  function handleTalkVolume(value) {
-    if (!state.plugin) return;
-    $('talk-volume-display').textContent = value;
-    state.plugin.JS_TalkSetVolume(parseInt(value))
-      .catch((err) => log(`设置对讲音量失败: ${err}`, 'error'));
+  function showDemoPlaceholder() {
+    const c = $('player');
+    if (!c) return;
+    c.style.cssText = 'display:flex;align-items:center;justify-content:center;flex-direction:column;gap:14px;background:#000;';
+    c.innerHTML = `
+      <svg width="56" height="56" viewBox="0 0 56 56" fill="none">
+        <circle cx="28" cy="28" r="26" stroke="#2d4060" stroke-width="2"/>
+        <polygon points="22,18 44,28 22,38" fill="#3b82f6" opacity="0.5"/>
+      </svg>
+      <div style="font-size:13px;color:#94a3b8">请确认 h5player.min.js 引入路径后刷新页面</div>`;
   }
 
   // ===== OSD 时间轮询 =====
-  function startOSDPolling() {
-    if (state.osdTimer) return;
-    state.osdTimer = setInterval(() => {
-      if (!state.plugin) return;
-      state.plugin.JS_GetOSDTime(state.curIndex)
-        .then((time) => {
-          if (time) {
-            const d = new Date(time);
+  let osdTimer = null;
+  function startOSDPoll() {
+    if (osdTimer) return;
+    osdTimer = setInterval(() => {
+      if (!state.player) return;
+      state.player.JS_GetOSDTime(state.player.currentWindowIndex)
+        .then((ms) => {
+          if (ms) {
+            const d = new Date(ms);
             $('osd-time-display').textContent =
               `${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
           }
-        })
-        .catch(() => {});
+        }).catch(() => {});
     }, 1000);
   }
-
-  function stopOSDPolling() {
-    if (state.osdTimer) {
-      clearInterval(state.osdTimer);
-      state.osdTimer = null;
-    }
+  function stopOSDPoll() {
+    if (osdTimer) { clearInterval(osdTimer); osdTimer = null; }
     $('osd-time-display').textContent = '--:--:--';
   }
 
   // ===== 视频信息 =====
-  function refreshVideoInfo() {
-    if (!state.plugin) return;
-    state.plugin.JS_GetVideoInfo(state.curIndex)
+  function fetchVideoInfo() {
+    if (!state.player) return;
+    state.player.JS_GetVideoInfo(state.player.currentWindowIndex)
       .then((info) => {
         $('info-codec').textContent = info.VideType || '--';
-        $('info-resolution').textContent = `${info.width}x${info.height}`;
-        $('info-framerate').textContent = info.frameRate ? `${info.frameRate}fps` : '--';
-        $('info-bitrate').textContent = info.bitRate ? `${info.bitRate}Kbps` : '--';
+        $('info-resolution').textContent = (info.width && info.height) ? `${info.width}×${info.height}` : '--';
+        $('info-framerate').textContent = info.frameRate ? `${info.frameRate} fps` : '--';
+        $('info-bitrate').textContent = info.bitRate ? `${info.bitRate} Kbps` : '--';
         $('info-audio').textContent = info.audioType || '--';
         $('info-format').textContent = info.systemFormt || '--';
-        $('modal-video-info').innerHTML = `
-          <table style="width:100%;border-collapse:collapse;font-size:12px;">
-            ${Object.entries(info).map(([k,v]) => `
-              <tr style="border-bottom:1px solid #2d4060">
-                <td style="padding:6px 8px;color:#94a3b8;width:40%">${k}</td>
-                <td style="padding:6px 8px;color:#e2e8f0;font-family:monospace">${v}</td>
-              </tr>`).join('')}
-          </table>
-        `;
-      })
-      .catch(() => {});
+      }).catch(() => {});
   }
-
   function resetVideoInfo() {
-    ['info-codec','info-resolution','info-framerate','info-bitrate','info-audio','info-format']
-      .forEach(id => { $(id).textContent = '--'; });
+    ['info-codec', 'info-resolution', 'info-framerate', 'info-bitrate', 'info-audio', 'info-format']
+      .forEach((id) => { $(id).textContent = '--'; });
   }
 
-  // ===== 模式切换 =====
+  // ===== 预览 =====
+  function handleRealplay() {
+    if (!state.player) { toast('播放器未就绪', 'warning'); return; }
+    const playURL = $('realplay-url').value.trim();
+    if (!playURL) { toast('请输入预览 URL', 'warning'); return; }
+    const token = $('auth-token').value.trim();
+    const index = state.player.currentWindowIndex;
+
+    state.player.JS_SetTraceId(index, true);
+    state.player.JS_Play(
+      playURL,
+      { playURL, mode: state.decodeMode, keepDecoder: 0, ...(token ? { token } : {}) },
+      index
+    ).then(() => {
+      log('预览成功', 'success');
+      toast('预览成功', 'success');
+      state.player.JS_GetTraceId(index).then((id) => log(`traceId: ${id}`, 'info')).catch(() => {});
+    }).catch((e) => {
+      log(`预览失败: ${JSON.stringify(e)}`, 'error');
+      toast('预览失败，请检查 URL 和网络', 'error');
+    });
+  }
+
+  function handleStop() {
+    if (!state.player) return;
+    // JS_Stop 不传参时自动使用 currentWindowIndex
+    state.player.JS_Stop().then(() => {
+      log('停止成功', 'success');
+      stopOSDPoll();
+      resetVideoInfo();
+    }).catch((e) => log(`停止失败: ${e}`, 'error'));
+  }
+
+  function handleStopAll() {
+    if (!state.player) return;
+    state.player.JS_StopRealPlayAll().then(() => {
+      log('停止全部成功', 'success');
+      stopOSDPoll();
+      resetVideoInfo();
+    }).catch((e) => log(`停止全部失败: ${e}`, 'error'));
+  }
+
+  // ===== 回放 =====
+  function handlePlayback(reverse = false) {
+    if (!state.player) { toast('播放器未就绪', 'warning'); return; }
+    const playURL = $('playback-url').value.trim();
+    if (!playURL) { toast('请输入回放 URL', 'warning'); return; }
+    const s = $('start-time').value;
+    const e = $('end-time').value;
+    if (!s || !e) { toast('请选择回放时间段', 'warning'); return; }
+    const token = $('auth-token').value.trim();
+    const index = state.player.currentWindowIndex;
+    const startTime = toPlaybackTime(s);
+    const endTime = toPlaybackTime(e);
+    const config = {
+      playURL,
+      mode: state.decodeMode,
+      keepDecoder: 0,
+      PlayBackMode: reverse ? 3 : 1,
+      ...(token ? { token } : {}),
+    };
+    state.player.JS_Play(playURL, config, index, startTime, endTime)
+      .then(() => {
+        state.currentRate = 1;
+        updateRateDisplay(1);
+        log(`${reverse ? '倒向' : '正向'}回放成功`, 'success');
+        toast(`${reverse ? '倒向' : '正向'}回放成功`, 'success');
+      })
+      .catch((err) => {
+        log(`回放失败: ${JSON.stringify(err)}`, 'error');
+        toast('回放失败', 'error');
+      });
+  }
+
+  function handlePause() {
+    if (!state.player) return;
+    state.player.JS_Pause(state.player.currentWindowIndex)
+      .then(() => log('暂停', 'info'))
+      .catch((e) => log(`暂停失败: ${e}`, 'error'));
+  }
+
+  function handleResume(forward = true) {
+    if (!state.player) return;
+    state.player.JS_Resume(state.player.currentWindowIndex, forward)
+      .then(() => log(`恢复${forward ? '正向' : '倒向'}播放`, 'info'))
+      .catch((e) => log(`恢复失败: ${e}`, 'error'));
+  }
+
+  function handleFrameForward() {
+    if (!state.player) return;
+    state.player.JS_FrameForward(state.player.currentWindowIndex)
+      .then(() => { updateRateDisplay(1); log('单帧进', 'info'); })
+      .catch((e) => log(`单帧进失败: ${JSON.stringify(e)}`, 'error'));
+  }
+
+  function handleFrameBack() {
+    if (!state.player) return;
+    state.player.JS_FrameBack(state.player.currentWindowIndex)
+      .then(() => { updateRateDisplay(1); log('单帧退', 'info'); })
+      .catch((e) => log(`单帧退失败: ${JSON.stringify(e)}`, 'error'));
+  }
+
+  function handleFast() {
+    if (!state.player) return;
+    // 官方 demo: JS_Fast 不传 windowIndex
+    state.player.JS_Fast()
+      .then((rate) => { state.currentRate = rate; updateRateDisplay(rate); log(`快放 ${rate}x`, 'info'); })
+      .catch((e) => {
+        const code = e && e.errorCode;
+        if (code === 0x12f910021) toast('已是最大倍速', 'warning');
+        else log(`快放失败: ${JSON.stringify(e)}`, 'error');
+      });
+  }
+
+  function handleSlow() {
+    if (!state.player) return;
+    state.player.JS_Slow()
+      .then((rate) => { state.currentRate = rate; updateRateDisplay(rate); log(`慢放 ${rate}x`, 'info'); })
+      .catch((e) => {
+        const code = e && e.errorCode;
+        if (code === 0x12f910022) toast('已是最小倍速', 'warning');
+        else log(`慢放失败: ${JSON.stringify(e)}`, 'error');
+      });
+  }
+
+  function handleSpeed() {
+    if (!state.player) return;
+    const rate = parseFloat($('speed-select').value);
+    state.player.JS_Speed(state.player.currentWindowIndex, rate)
+      .then((r) => { state.currentRate = r; updateRateDisplay(r); log(`倍速 ${r}x`, 'info'); })
+      .catch((e) => log(`倍速失败: ${JSON.stringify(e)}`, 'error'));
+  }
+
+  function handleChangeMode() {
+    if (!state.player) return;
+    state.player.JS_ChangeMode(state.player.currentWindowIndex)
+      .then(() => log('正/倒放切换成功', 'info'))
+      .catch((e) => log(`切换失败: ${JSON.stringify(e)}`, 'error'));
+  }
+
+  function handleSeek() {
+    if (!state.player) return;
+    const seekStart = $('seek-time').value;
+    const endTime = $('end-time').value;
+    if (!seekStart) { toast('请选择定位时间', 'warning'); return; }
+    const t1 = toPlaybackTime(seekStart);
+    const t2 = toPlaybackTime(endTime || seekStart);
+    state.player.JS_Seek(state.player.currentWindowIndex, t1, t2)
+      .then(() => log(`定位: ${t1}`, 'success'))
+      .catch((e) => log(`定位失败: ${JSON.stringify(e)}`, 'error'));
+  }
+
+  function updateRateDisplay(rate) {
+    const rateMap = { '-8': '⅛', '-4': '¼', '-2': '½' };
+    const display = rateMap[String(rate)] ? rateMap[String(rate)] + 'x' : `${rate}x`;
+    $('current-rate').textContent = display;
+  }
+
+  // ===== 即时回放 =====
+  function handleInstantOpen() {
+    if (!state.player) return;
+    const bInstantTime = parseInt($('instant-time').value);
+    state.player.JS_InstantSetParam(state.player.currentWindowIndex, { bOpenflag: true, bInstantTime })
+      .then(() => { log(`即时回放参数已设置: ${bInstantTime}s`, 'success'); toast('即时回放已开启，请等待 2 秒后再开始', 'success'); })
+      .catch((e) => log(`即时回放参数失败: ${JSON.stringify(e)}`, 'error'));
+  }
+
+  function handleInstantStart() {
+    if (!state.player) return;
+    state.player.JS_StartInstant(state.player.currentWindowIndex)
+      .then(() => log('即时回放已开始', 'success'))
+      .catch((e) => {
+        const code = e && e.errorCode;
+        if (code === 0x12f910041) toast('缓冲区无数据，请等待2秒后重试', 'warning');
+        else log(`即时回放开始失败: ${JSON.stringify(e)}`, 'error');
+      });
+  }
+
+  function handleInstantStop() {
+    if (!state.player) return;
+    state.player.JS_StopInstant(state.player.currentWindowIndex)
+      .then(() => log('即时回放已停止，跳回预览', 'info'))
+      .catch((e) => log(`即时回放停止失败: ${JSON.stringify(e)}`, 'error'));
+  }
+
+  function handleInstantTotal() {
+    if (!state.player) return;
+    state.player.JS_InstantTotalDuration(state.player.currentWindowIndex)
+      .then((t) => { log(`即时回放总时长: ${t}s`, 'info'); toast(`总时长: ${t}s`, 'info'); })
+      .catch((e) => log(`获取总时长失败: ${e}`, 'error'));
+  }
+
+  function handleInstantCurr() {
+    if (!state.player) return;
+    state.player.JS_InstantCurrDuration(state.player.currentWindowIndex)
+      .then((t) => { log(`即时回放当前: ${t}s`, 'info'); toast(`当前播放: ${t}s`, 'info'); })
+      .catch((e) => log(`获取当前时长失败: ${e}`, 'error'));
+  }
+
+  // ===== 对讲 =====
+  function handleTalkStart() {
+    if (!state.player) return;
+    const url = $('talk-url').value.trim();
+    if (!url) { toast('请输入对讲 URL', 'warning'); return; }
+    const token = $('auth-token').value.trim();
+    state.player.JS_StartTalk(url, token ? { token } : {})
+      .then(() => { log('对讲已开启', 'success'); toast('对讲已开启（需 HTTPS）', 'success'); $('btn-talk-start').classList.add('active'); })
+      .catch((e) => {
+        log(`对讲失败: ${JSON.stringify(e)}`, 'error');
+        toast('对讲需要 HTTPS 环境', 'error');
+      });
+  }
+
+  function handleTalkStop() {
+    if (!state.player) return;
+    state.player.JS_StopTalk()
+      .then(() => { log('对讲已停止', 'info'); $('btn-talk-start').classList.remove('active'); })
+      .catch((e) => log(`停止对讲失败: ${e}`, 'error'));
+  }
+
+  function handleRecordTalk() {
+    if (!state.player) return;
+    const type = parseInt($('audio-type').value);
+    const fileName = `talk_${formatTs(new Date())}.mp3`;
+    state.player.JS_StartSaveTalk(fileName, type)
+      .then(() => { log(`对讲录音开始: ${fileName}`, 'success'); $('btn-record-talk').classList.add('active'); })
+      .catch((e) => log(`对讲录音失败: ${e}`, 'error'));
+  }
+
+  function handleStopRecordTalk() {
+    if (!state.player) return;
+    state.player.JS_StopSaveTalk()
+      .then(() => { log('对讲录音已保存', 'success'); $('btn-record-talk').classList.remove('active'); })
+      .catch((e) => log(`停止对讲录音失败: ${e}`, 'error'));
+  }
+
+  // ===== 音量 =====
+  function handleOpenSound() {
+    if (!state.player) return;
+    state.player.JS_OpenSound()
+      .then(() => { state.soundOpen = true; log('声音已开启', 'success'); })
+      .catch((e) => {
+        const code = e && e.errorCode;
+        if (code === 0x12f900012) toast('请等待首帧显示后再开启声音', 'warning');
+        else log(`开声音失败: ${JSON.stringify(e)}`, 'error');
+      });
+  }
+
+  function handleCloseSound() {
+    if (!state.player) return;
+    state.player.JS_CloseSound()
+      .then(() => { state.soundOpen = false; log('声音已关闭', 'info'); })
+      .catch((e) => log(`关声音失败: ${e}`, 'error'));
+  }
+
+  function handleVolumeChange(val) {
+    $('volume-display').textContent = val;
+    if (!state.player) return;
+    state.player.JS_SetVolume(state.player.currentWindowIndex, parseInt(val))
+      .catch((e) => log(`音量设置失败: ${e}`, 'error'));
+  }
+
+  // ===== 录像 =====
+  function handleRecordStart(type) {
+    if (!state.player) return;
+    const codeMap = { MP4: 5, PS: 2 };
+    const fileName = `record_${formatTs(new Date())}.mp4`;
+    state.player.JS_StartSaveEx(
+      state.player.currentWindowIndex,
+      fileName,
+      codeMap[type],
+      { irecordType: 1 }
+    ).then(() => {
+      state.recording = true;
+      $('btn-record-mp4').style.display = 'none';
+      $('btn-record-ps').style.display = 'none';
+      $('btn-record-stop').style.display = '';
+      log(`录制 ${type} 开始: ${fileName}`, 'success');
+      toast(`录制已开始 (${type})`, 'success');
+    }).catch((e) => {
+      log(`录制失败: ${JSON.stringify(e)}`, 'error');
+      toast('录制失败，请先播放视频', 'error');
+    });
+  }
+
+  function handleRecordStop() {
+    if (!state.player) return;
+    state.player.JS_StopSave(state.player.currentWindowIndex)
+      .then(() => {
+        state.recording = false;
+        $('btn-record-mp4').style.display = '';
+        $('btn-record-ps').style.display = '';
+        $('btn-record-stop').style.display = 'none';
+        log('录制已停止并保存', 'success');
+        toast('录像已保存到本地', 'success');
+      }).catch((e) => log(`停止录制失败: ${e}`, 'error'));
+  }
+
+  // ===== 截图 =====
+  function handleCapture() {
+    if (!state.player) return;
+    const fileName = `img_${formatTs(new Date())}`;
+    state.player.JS_CapturePicture(state.player.currentWindowIndex, fileName, 'JPEG')
+      .then(() => { log(`截图已保存: ${fileName}.jpg`, 'success'); toast('截图已保存', 'success'); })
+      .catch((e) => {
+        const code = e && e.errorCode;
+        if (code === 0x12f930011) toast('请等待首帧显示后再截图', 'warning');
+        else log(`截图失败: ${JSON.stringify(e)}`, 'error');
+      });
+  }
+
+  // ===== 电子放大 =====
+  function handleZoomEnable() {
+    if (!state.player) return;
+    state.player.JS_EnableZoom(state.player.currentWindowIndex)
+      .then(() => {
+        state.zoomEnabled = true;
+        $('btn-zoom-enable').style.display = 'none';
+        $('btn-zoom-disable').style.display = '';
+        log('电子放大已开启，拖拽选取区域', 'info');
+      })
+      .catch((e) => log(`开启电子放大失败: ${JSON.stringify(e)}`, 'error'));
+  }
+
+  function handleZoomDisable() {
+    if (!state.player) return;
+    state.player.JS_DisableZoom(state.player.currentWindowIndex)
+      .then(() => {
+        state.zoomEnabled = false;
+        $('btn-zoom-enable').style.display = '';
+        $('btn-zoom-disable').style.display = 'none';
+        log('电子放大已关闭', 'info');
+      })
+      .catch((e) => log(`关闭电子放大失败: ${e}`, 'error'));
+  }
+
+  // ===== 旋转 & 缩放 =====
+  function handleRotate() {
+    if (!state.player) return;
+    const degree = parseInt($('rotate-select').value);
+    state.player.JS_Rotate(state.player.currentWindowIndex, degree)
+      .then(() => log(`旋转: ${degree}°`, 'info'))
+      .catch((e) => log(`旋转失败: ${e}`, 'error'));
+  }
+
+  function handleScale() {
+    if (!state.player) return;
+    const ratio = $('scale-select').value;
+    state.player.JS_Scale(state.player.currentWindowIndex, ratio)
+      .then(() => log(`缩放: ${ratio}`, 'info'))
+      .catch((e) => log(`缩放失败: ${e}`, 'error'));
+  }
+
+  function handleScaleCancel() {
+    if (!state.player) return;
+    state.player.JS_ScaleCancel(state.player.currentWindowIndex)
+      .then(() => {
+        $('rotate-select').value = '0';
+        $('scale-select').value = 'fill';
+        log('已还原旋转/缩放', 'info');
+      })
+      .catch((e) => log(`还原失败: ${e}`, 'error'));
+  }
+
+  // ===== 智能信息 =====
+  function handleIntellect(open) {
+    if (!state.player) return;
+    state.player.JS_RenderALLPrivateData(state.player.currentWindowIndex, open)
+      .then(() => log(`智能信息: ${open ? '已开启' : '已关闭'}`, 'info'))
+      .catch((e) => log(`智能信息失败: ${JSON.stringify(e)}`, 'error'));
+  }
+
+  // ===== 缩略图 =====
+  function handleThumbnailsOpen() {
+    if (!state.player) return;
+    const playURL = $('playback-url').value.trim();
+    const s = $('start-time').value;
+    const e = $('end-time').value;
+    if (!playURL || !s || !e) { toast('请先填写回放 URL 和时间段', 'warning'); return; }
+    const token = $('auth-token').value.trim();
+    state.player.JS_StartVideoThumbnails(
+      state.player.currentWindowIndex,
+      playURL,
+      toPlaybackTime(s),
+      toPlaybackTime(e),
+      { snapwidth: 320, snapheight: 180, ...(token ? { token } : {}) }
+    ).then(() => log('缩略图已开启', 'success'))
+     .catch((e) => log(`开启缩略图失败: ${JSON.stringify(e)}`, 'error'));
+  }
+
+  function handleThumbnailsGet() {
+    if (!state.player) return;
+    const t = $('thumbnail-time').value;
+    if (!t) { toast('请选择缩略图时间', 'warning'); return; }
+    const videoTime = toPlaybackTime(t);
+    state.player.JS_GetVideoThumbnails(
+      state.player.currentWindowIndex,
+      videoTime,
+      function (timestamp, dataUrl) {
+        log(`缩略图获取成功 ${timestamp}`, 'success');
+        if (dataUrl) {
+          $('thumbnail-img').src = dataUrl;
+          $('thumbnail-preview').style.display = '';
+        }
+      }
+    ).then(() => {}).catch((e) => log(`获取缩略图失败: ${JSON.stringify(e)}`, 'error'));
+  }
+
+  function handleThumbnailsClose() {
+    if (!state.player) return;
+    state.player.JS_StopVideoThumbnails(state.player.currentWindowIndex)
+      .then(() => { log('缩略图已停止', 'info'); $('thumbnail-preview').style.display = 'none'; })
+      .catch((e) => log(`停止缩略图失败: ${e}`, 'error'));
+  }
+
+  // ===== 水印 =====
+  function handleWatermarkSet() {
+    if (!state.player) return;
+    const cfg = {
+      text: $('wm-text').value || 'h5player',
+      color: $('wm-color').value || undefined,
+      font: $('wm-font').value || undefined,
+      rotateDegree: parseInt($('wm-degree').value),
+      space: parseInt($('wm-space').value),
+    };
+    if (!cfg.color) delete cfg.color;
+    if (!cfg.font) delete cfg.font;
+    if (isNaN(cfg.rotateDegree)) delete cfg.rotateDegree;
+    if (isNaN(cfg.space)) delete cfg.space;
+    state.player.JS_SetWatermarkConfig(cfg)
+      .then(() => { log('水印已设置', 'success'); toast('水印已设置，截图时生效', 'success'); })
+      .catch((e) => log(`水印设置失败: ${JSON.stringify(e)}`, 'error'));
+  }
+
+  function handleWatermarkCancel() {
+    if (!state.player) return;
+    state.player.JS_CancelWatermarkConfig()
+      .then(() => log('水印已清除', 'info'))
+      .catch((e) => log(`清除水印失败: ${e}`, 'error'));
+  }
+
+  // ===== 分屏 =====
+  function handleSplit(n) {
+    if (!state.player) return;
+    state.player.JS_ArrangeWindow(n)
+      .then(() => {
+        log(`分屏: ${n}×${n}`, 'info');
+        $$('.split-btn').forEach((b) => b.classList.toggle('active', parseInt(b.dataset.split) === n));
+      })
+      .catch((e) => log(`分屏失败: ${e}`, 'error'));
+  }
+
+  // ===== 全屏 =====
+  function handleWholeFullscreen() {
+    if (!state.player) return;
+    state.player.JS_FullScreenDisplay(true)
+      .then(() => log('整体全屏', 'info'))
+      .catch((e) => log(`整体全屏失败: ${e}`, 'error'));
+  }
+
+  function handleSingleFullscreen() {
+    if (!state.player) return;
+    state.player.JS_FullScreenSingle(state.player.currentWindowIndex)
+      .then(() => log('单窗全屏', 'info'))
+      .catch((e) => log(`单窗全屏失败: ${e}`, 'error'));
+  }
+
+  // ===== 模式切换（预览/回放）=====
   function switchMode(mode) {
     state.mode = mode;
-    $$('.nav-btn').forEach(btn => btn.classList.toggle('active', btn.dataset.mode === mode));
+    $$('.nav-btn').forEach((b) => b.classList.toggle('active', b.dataset.mode === mode));
     const isPlayback = mode === 'playback';
-    $('playback-config').style.display = isPlayback ? '' : 'none';
-    $('playback-controls').style.display = isPlayback ? '' : 'none';
+    $('preview-section').style.display = isPlayback ? 'none' : '';
+    $('instant-section').style.display = isPlayback ? 'none' : '';
+    $('playback-section').style.display = isPlayback ? '' : 'none';
+    $('playback-controls-section').style.display = isPlayback ? '' : 'none';
   }
 
-  // ===== 工具函数 =====
-  function toISO(localStr) {
-    if (!localStr) return undefined;
-    return new Date(localStr).toISOString().replace('.000Z', 'Z');
-  }
-
-  function formatTimestamp(d) {
-    return `${d.getFullYear()}${pad(d.getMonth()+1)}${pad(d.getDate())}_${pad(d.getHours())}${pad(d.getMinutes())}${pad(d.getSeconds())}`;
-  }
-
-  // ===== 绑定事件 =====
+  // ===== 绑定所有事件 =====
   function bindEvents() {
     // 模式切换
-    $$('.nav-btn').forEach(btn => {
-      btn.addEventListener('click', () => switchMode(btn.dataset.mode));
-    });
+    $$('.nav-btn').forEach((b) => b.addEventListener('click', () => switchMode(b.dataset.mode)));
 
-    // 播放/停止
-    $('btn-play')?.addEventListener('click', handlePlay);
-    $('btn-stop')?.addEventListener('click', handleStop);
-
-    // 音量
-    $('btn-open-sound')?.addEventListener('click', handleOpenSound);
-    $('btn-close-sound')?.addEventListener('click', handleCloseSound);
-    $('btn-mute')?.addEventListener('click', () => {
-      state.soundOpen ? handleCloseSound() : handleOpenSound();
-    });
-    $('volume-slider')?.addEventListener('input', (e) => handleVolumeChange(e.target.value));
-
-    // 录像
-    $('btn-record-start')?.addEventListener('click', handleRecordStart);
-    $('btn-record-stop')?.addEventListener('click', handleRecordStop);
-
-    // 抓图
-    $('btn-capture')?.addEventListener('click', handleCapture);
-
-    // 回放控制
-    $('btn-pause')?.addEventListener('click', handlePause);
-    $('btn-resume')?.addEventListener('click', handleResume);
-    $('btn-frame-forward')?.addEventListener('click', handleFrameForward);
-    $('btn-frame-back')?.addEventListener('click', handleFrameBack);
-    $('btn-fast')?.addEventListener('click', handleFast);
-    $('btn-slow')?.addEventListener('click', handleSlow);
-    $('btn-change-mode')?.addEventListener('click', handleChangeMode);
-
-    // 速率按钮
-    $$('.speed-btn').forEach(btn => {
-      btn.addEventListener('click', () => handleSpeed(parseInt(btn.dataset.rate)));
-    });
-
-    // 旋转按钮
-    $$('.rotate-btn').forEach(btn => {
-      btn.addEventListener('click', () => handleRotate(parseInt(btn.dataset.degree)));
-    });
-
-    // 缩放
-    $('scale-ratio')?.addEventListener('change', (e) => handleScale(e.target.value));
-    $('btn-scale-cancel')?.addEventListener('click', handleScaleCancel);
-
-    // 电子放大
-    $('btn-zoom')?.addEventListener('click', handleZoomToggle);
-
-    // 旋转（工具栏）
-    $('btn-rotate')?.addEventListener('click', () => {
-      const next = (state.currentRotation + 90) % 360;
-      handleRotate(next);
+    // 解码模式
+    $$('.tab-pill').forEach((b) => {
+      b.addEventListener('click', () => {
+        state.decodeMode = parseInt(b.dataset.mode);
+        $$('.tab-pill').forEach((t) => t.classList.toggle('active', t === b));
+        log(`解码模式: ${state.decodeMode === 0 ? '普通' : '高级'}`, 'info');
+      });
     });
 
     // 分屏
-    $$('[data-split]').forEach(btn => {
-      btn.addEventListener('click', () => handleSplit(parseInt(btn.dataset.split)));
-    });
+    $$('.split-btn').forEach((b) => b.addEventListener('click', () => handleSplit(parseInt(b.dataset.split))));
 
     // 全屏
-    $('btn-fullscreen')?.addEventListener('click', handleFullscreen);
-    $('btn-fullscreen-single')?.addEventListener('click', handleFullscreenSingle);
+    $('btn-whole-fullscreen')?.addEventListener('click', handleWholeFullscreen);
+    $('btn-single-fullscreen')?.addEventListener('click', handleSingleFullscreen);
+
+    // 预览
+    $('btn-realplay')?.addEventListener('click', handleRealplay);
+    $('btn-stop-realplay')?.addEventListener('click', handleStop);
+    $('btn-stopall')?.addEventListener('click', handleStopAll);
+    $('realplay-url')?.addEventListener('keydown', (e) => { if (e.key === 'Enter') handleRealplay(); });
+
+    // 即时回放
+    $('btn-instant-open')?.addEventListener('click', handleInstantOpen);
+    $('btn-instant-start')?.addEventListener('click', handleInstantStart);
+    $('btn-instant-stop')?.addEventListener('click', handleInstantStop);
+    $('btn-instant-total')?.addEventListener('click', handleInstantTotal);
+    $('btn-instant-curr')?.addEventListener('click', handleInstantCurr);
+
+    // 回放
+    $('btn-playback-start')?.addEventListener('click', () => handlePlayback(false));
+    $('btn-reverse-start')?.addEventListener('click', () => handlePlayback(true));
+    $('btn-stop-playback')?.addEventListener('click', handleStop);
+    $('btn-pause')?.addEventListener('click', handlePause);
+    $('btn-resume')?.addEventListener('click', () => handleResume(true));
+    $('btn-resume-reverse')?.addEventListener('click', () => handleResume(false));
+    $('btn-frame-forward')?.addEventListener('click', handleFrameForward);
+    $('btn-frame-back')?.addEventListener('click', handleFrameBack);
+    $('btn-change-mode')?.addEventListener('click', handleChangeMode);
+    $('btn-fast')?.addEventListener('click', handleFast);
+    $('btn-slow')?.addEventListener('click', handleSlow);
+    $('btn-speed')?.addEventListener('click', handleSpeed);
+    $('btn-seek')?.addEventListener('click', handleSeek);
 
     // 对讲
-    $('btn-start-talk')?.addEventListener('click', handleStartTalk);
-    $('btn-stop-talk')?.addEventListener('click', handleStopTalk);
-    $('talk-volume-slider')?.addEventListener('input', (e) => handleTalkVolume(e.target.value));
+    $('btn-talk-start')?.addEventListener('click', handleTalkStart);
+    $('btn-talk-stop')?.addEventListener('click', handleTalkStop);
+    $('btn-record-talk')?.addEventListener('click', handleRecordTalk);
+    $('btn-stop-record-talk')?.addEventListener('click', handleStopRecordTalk);
 
-    // 视频信息弹窗
-    $('btn-video-info')?.addEventListener('click', () => {
-      refreshVideoInfo();
-      $('video-info-modal').style.display = 'flex';
-    });
-    $('close-video-modal')?.addEventListener('click', () => {
-      $('video-info-modal').style.display = 'none';
-    });
-    $('video-info-modal')?.addEventListener('click', (e) => {
-      if (e.target === $('video-info-modal')) $('video-info-modal').style.display = 'none';
+    // 声音 & 音量
+    $('btn-open-sound')?.addEventListener('click', handleOpenSound);
+    $('btn-close-sound')?.addEventListener('click', handleCloseSound);
+    $('volume-slider')?.addEventListener('input', (e) => handleVolumeChange(e.target.value));
+
+    // 录像 & 截图
+    $('btn-capture')?.addEventListener('click', handleCapture);
+    $('btn-record-mp4')?.addEventListener('click', () => handleRecordStart('MP4'));
+    $('btn-record-ps')?.addEventListener('click', () => handleRecordStart('PS'));
+    $('btn-record-stop')?.addEventListener('click', handleRecordStop);
+
+    // 电子放大
+    $('btn-zoom-enable')?.addEventListener('click', handleZoomEnable);
+    $('btn-zoom-disable')?.addEventListener('click', handleZoomDisable);
+
+    // 视频信息
+    $('btn-get-video-info')?.addEventListener('click', () => {
+      fetchVideoInfo();
+      log('已刷新视频信息', 'info');
     });
 
-    // 清空日志
-    $('btn-clear-log')?.addEventListener('click', () => {
-      $('log-container').innerHTML = '';
-    });
+    // 旋转 & 缩放
+    $('rotate-select')?.addEventListener('change', handleRotate);
+    $('scale-select')?.addEventListener('change', handleScale);
+    $('btn-scale-cancel')?.addEventListener('click', handleScaleCancel);
 
-    // URL输入框回车播放
-    $('stream-url')?.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') handlePlay();
-    });
+    // 智能信息
+    $('btn-intellect-open')?.addEventListener('click', () => handleIntellect(true));
+    $('btn-intellect-close')?.addEventListener('click', () => handleIntellect(false));
+
+    // 缩略图
+    $('btn-thumbnails-open')?.addEventListener('click', handleThumbnailsOpen);
+    $('btn-thumbnails-get')?.addEventListener('click', handleThumbnailsGet);
+    $('btn-thumbnails-close')?.addEventListener('click', handleThumbnailsClose);
+
+    // 水印
+    $('btn-watermark-set')?.addEventListener('click', handleWatermarkSet);
+    $('btn-watermark-cancel')?.addEventListener('click', handleWatermarkCancel);
+
+    // 日志清空
+    $('btn-clear-log')?.addEventListener('click', () => { $('log-container').innerHTML = ''; });
   }
 
-  // ===== 页面加载完成后初始化 =====
+  // ===== 入口 =====
   document.addEventListener('DOMContentLoaded', () => {
     bindEvents();
-    initPlugin();
-    log('播放器界面已加载', 'info');
+    createPlayer();
+    log('播放器已初始化', 'info');
   });
 
 })();
