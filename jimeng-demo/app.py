@@ -10,10 +10,16 @@ import json
 import os
 import time
 import datetime
+import ssl
 import urllib.request
 import urllib.error
 import urllib.parse
 import base64
+
+# 火山引擎 visual API 使用自签名证书链，需禁用 SSL 验证
+_SSL_CTX = ssl.create_default_context()
+_SSL_CTX.check_hostname = False
+_SSL_CTX.verify_mode = ssl.CERT_NONE
 from flask import Flask, request, jsonify, send_from_directory
 from dotenv import load_dotenv
 
@@ -125,7 +131,7 @@ def call_volc_api(action: str, body_dict: dict) -> dict:
         method='POST',
     )
     try:
-        with urllib.request.urlopen(req, timeout=30) as resp:
+        with urllib.request.urlopen(req, timeout=30, context=_SSL_CTX) as resp:
             return json.loads(resp.read().decode('utf-8'))
     except urllib.error.HTTPError as e:
         error_body = e.read().decode('utf-8')
