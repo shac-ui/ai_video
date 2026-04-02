@@ -1,0 +1,1580 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>即梦AI 图片 & 视频生成 Demo</title>
+  <style>
+    /* ===== 基础变量 ===== */
+    :root {
+      --bg: #0d1117;
+      --bg2: #161b22;
+      --bg3: #21262d;
+      --border: #30363d;
+      --border2: #3d444d;
+      --text: #e6edf3;
+      --text2: #8b949e;
+      --text3: #656d76;
+      --accent: #7c3aed;
+      --accent2: #6d28d9;
+      --accent-light: rgba(124,58,237,0.15);
+      --success: #2ea043;
+      --danger: #f85149;
+      --warning: #d29922;
+      --radius: 10px;
+      --radius-sm: 6px;
+      --shadow: 0 8px 32px rgba(0,0,0,0.5);
+      --t: 0.18s ease;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      min-height: 100vh;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+      font-size: 14px;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+    }
+
+    /* ===== 布局 ===== */
+    .container { max-width: 1280px; margin: 0 auto; padding: 0 20px; }
+
+    /* ===== 顶部 Header ===== */
+    header {
+      border-bottom: 1px solid var(--border);
+      padding: 14px 0;
+      position: sticky;
+      top: 0;
+      background: rgba(13,17,23,0.92);
+      backdrop-filter: blur(10px);
+      z-index: 100;
+    }
+    .header-inner {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+    }
+    .logo-icon {
+      width: 32px; height: 32px;
+      background: linear-gradient(135deg, #7c3aed, #2563eb);
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .logo-icon svg { width: 18px; height: 18px; }
+    .logo-title { font-size: 17px; font-weight: 700; color: var(--text); }
+    .logo-sub { font-size: 11px; color: var(--text3); margin-top: 1px; }
+
+    /* 版本切换 */
+    .version-tabs {
+      display: flex;
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 3px;
+      gap: 2px;
+    }
+    .version-tab {
+      padding: 5px 16px;
+      border-radius: 4px;
+      border: none;
+      background: transparent;
+      color: var(--text2);
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: var(--t);
+    }
+    .version-tab:hover { color: var(--text); background: var(--border); }
+    .version-tab.active { background: var(--accent); color: #fff; }
+
+    /* 状态指示 */
+    .config-status {
+      margin-left: auto;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+    }
+    .dot {
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      background: var(--danger);
+    }
+    .dot.ok { background: var(--success); }
+    #config-text { color: var(--text2); }
+
+    /* ===== 主体两栏 ===== */
+    .main-grid {
+      display: grid;
+      grid-template-columns: 400px 1fr;
+      gap: 24px;
+      padding: 24px 0 40px;
+    }
+    @media (max-width: 900px) {
+      .main-grid { grid-template-columns: 1fr; }
+    }
+
+    /* ===== 卡片 ===== */
+    .card {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+    }
+    .card-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text2);
+      text-transform: uppercase;
+      letter-spacing: 0.7px;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+    }
+    .card-title svg { color: var(--accent); }
+
+    /* ===== 表单 ===== */
+    .form-group { margin-bottom: 14px; }
+    .form-label {
+      display: block;
+      font-size: 12px;
+      color: var(--text2);
+      margin-bottom: 5px;
+      font-weight: 500;
+    }
+    .form-input, .form-select, .form-textarea {
+      width: 100%;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      color: var(--text);
+      padding: 8px 11px;
+      font-size: 13px;
+      outline: none;
+      transition: var(--t);
+      font-family: inherit;
+    }
+    .form-input:focus, .form-select:focus, .form-textarea:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-light);
+    }
+    .form-input::placeholder, .form-textarea::placeholder { color: var(--text3); }
+    .form-textarea { resize: vertical; min-height: 100px; line-height: 1.6; }
+    .form-select {
+      cursor: pointer;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M2 4l4 4 4-4' stroke='%238b949e' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 10px center;
+      padding-right: 30px;
+    }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+    /* 滑块 */
+    .slider-row { display: flex; align-items: center; gap: 10px; }
+    .form-range {
+      flex: 1;
+      -webkit-appearance: none;
+      height: 4px;
+      background: var(--border);
+      border-radius: 2px;
+      outline: none;
+      cursor: pointer;
+    }
+    .form-range::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 15px; height: 15px;
+      border-radius: 50%;
+      background: var(--accent);
+      cursor: pointer;
+    }
+    .slider-val {
+      font-size: 12px;
+      color: var(--text2);
+      width: 32px;
+      text-align: right;
+      flex-shrink: 0;
+    }
+
+    /* 图片上传区 */
+    .upload-zone {
+      border: 2px dashed var(--border);
+      border-radius: var(--radius-sm);
+      padding: 20px;
+      text-align: center;
+      cursor: pointer;
+      transition: var(--t);
+      position: relative;
+      overflow: hidden;
+    }
+    .upload-zone:hover { border-color: var(--accent); background: var(--accent-light); }
+    .upload-zone.has-images { border-style: solid; border-color: var(--accent); }
+    .upload-zone input[type="file"] {
+      position: absolute; inset: 0; opacity: 0; cursor: pointer;
+    }
+    .upload-hint { font-size: 12px; color: var(--text3); margin-top: 4px; }
+    .upload-preview {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 10px;
+    }
+    .preview-item {
+      position: relative;
+      width: 72px; height: 72px;
+      border-radius: 6px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+    }
+    .preview-item img { width: 100%; height: 100%; object-fit: cover; }
+    .preview-remove {
+      position: absolute;
+      top: 2px; right: 2px;
+      background: rgba(0,0,0,0.7);
+      border: none;
+      color: #fff;
+      width: 18px; height: 18px;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 11px;
+      display: flex; align-items: center; justify-content: center;
+    }
+
+    /* URL 输入 */
+    .url-add-row {
+      display: flex;
+      gap: 6px;
+      margin-top: 8px;
+    }
+    .url-tag-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 8px;
+    }
+    .url-tag {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 3px 8px;
+      font-size: 11px;
+      color: var(--text2);
+      max-width: 200px;
+    }
+    .url-tag span {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .url-tag button { background: none; border: none; color: var(--text3); cursor: pointer; padding: 0; font-size: 13px; line-height: 1; }
+    .url-tag button:hover { color: var(--danger); }
+
+    /* ===== 按钮 ===== */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      padding: 9px 18px;
+      border-radius: var(--radius-sm);
+      border: none;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: var(--t);
+      white-space: nowrap;
+    }
+    .btn-primary {
+      background: var(--accent);
+      color: #fff;
+      width: 100%;
+      padding: 11px;
+      font-size: 15px;
+    }
+    .btn-primary:hover { background: var(--accent2); }
+    .btn-primary:active { transform: scale(0.98); }
+    .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+    .btn-outline {
+      background: transparent;
+      border: 1px solid var(--border2);
+      color: var(--text2);
+      padding: 6px 12px;
+      font-size: 12px;
+      font-weight: 500;
+    }
+    .btn-outline:hover { border-color: var(--accent); color: var(--accent); }
+    .btn-sm { padding: 5px 10px; font-size: 12px; }
+
+    /* ===== 右栏：结果展示 ===== */
+    .result-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+    .result-meta { font-size: 12px; color: var(--text3); }
+
+    /* 状态条 */
+    .status-bar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 16px;
+      border-radius: var(--radius-sm);
+      font-size: 13px;
+      margin-bottom: 16px;
+    }
+    .status-bar.idle { background: var(--bg3); color: var(--text2); border: 1px solid var(--border); }
+    .status-bar.loading { background: rgba(124,58,237,0.12); color: #a78bfa; border: 1px solid rgba(124,58,237,0.3); }
+    .status-bar.success { background: rgba(46,160,67,0.12); color: #3fb950; border: 1px solid rgba(46,160,67,0.3); }
+    .status-bar.error { background: rgba(248,81,73,0.12); color: #ff7b72; border: 1px solid rgba(248,81,73,0.3); }
+
+    /* 加载动画 */
+    .spinner {
+      width: 16px; height: 16px;
+      border: 2px solid rgba(167,139,250,0.3);
+      border-top-color: #a78bfa;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      flex-shrink: 0;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* 进度条 */
+    .progress-wrap {
+      height: 3px;
+      background: var(--border);
+      border-radius: 2px;
+      margin-bottom: 16px;
+      overflow: hidden;
+    }
+    .progress-bar {
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent), #2563eb);
+      border-radius: 2px;
+      transition: width 0.4s ease;
+    }
+
+    /* 图片网格 */
+    .images-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 14px;
+    }
+    .image-card {
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      transition: var(--t);
+    }
+    .image-card:hover { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
+    .image-card img {
+      width: 100%; display: block;
+      cursor: zoom-in;
+    }
+    .image-actions {
+      display: flex;
+      gap: 6px;
+      padding: 10px;
+      border-top: 1px solid var(--border);
+    }
+    .image-actions a, .image-actions button {
+      flex: 1;
+      text-align: center;
+      padding: 6px;
+      font-size: 12px;
+      border-radius: 4px;
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--text2);
+      cursor: pointer;
+      text-decoration: none;
+      transition: var(--t);
+    }
+    .image-actions a:hover, .image-actions button:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    /* 空状态 */
+    .empty-state {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 320px;
+      color: var(--text3);
+      gap: 12px;
+    }
+    .empty-state svg { opacity: 0.3; }
+
+    /* 历史记录标签 */
+    .history-tabs {
+      display: flex;
+      gap: 4px;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+    }
+    .history-badge {
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 11px;
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      color: var(--text2);
+      cursor: pointer;
+      transition: var(--t);
+      max-width: 180px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .history-badge:hover { border-color: var(--accent); color: var(--accent); }
+    .history-badge.active { background: var(--accent-light); border-color: var(--accent); color: var(--accent); }
+
+    /* 灯箱 */
+    .lightbox {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.9);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      cursor: zoom-out;
+    }
+    .lightbox.open { display: flex; }
+    .lightbox img {
+      max-width: 92vw;
+      max-height: 92vh;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+    .lightbox-close {
+      position: absolute;
+      top: 20px; right: 20px;
+      width: 36px; height: 36px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.2);
+      color: #fff;
+      cursor: pointer;
+      font-size: 18px;
+      display: flex; align-items: center; justify-content: center;
+    }
+
+    /* Toast */
+    .toast-wrap {
+      position: fixed;
+      bottom: 24px; right: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      z-index: 2000;
+    }
+    .toast {
+      padding: 11px 16px;
+      border-radius: var(--radius-sm);
+      font-size: 13px;
+      font-weight: 500;
+      box-shadow: var(--shadow);
+      animation: toastIn 0.2s ease;
+      border-left: 3px solid;
+      max-width: 320px;
+    }
+    .toast.info { background: rgba(124,58,237,0.18); border-color: var(--accent); color: #a78bfa; }
+    .toast.success { background: rgba(46,160,67,0.18); border-color: var(--success); color: #3fb950; }
+    .toast.error { background: rgba(248,81,73,0.18); border-color: var(--danger); color: #ff7b72; }
+    @keyframes toastIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+
+    /* 参数说明 */
+    .tip-text { font-size: 11px; color: var(--text3); margin-top: 4px; }
+    .divider { border: none; border-top: 1px solid var(--border); margin: 16px 0; }
+
+    /* 折叠区 */
+    .collapsible-header {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      cursor: pointer;
+      user-select: none;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text2);
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+    }
+    .collapsible-header:hover { color: var(--text); }
+    .collapse-icon { transition: transform 0.2s ease; font-size: 10px; }
+    .collapse-icon.open { transform: rotate(90deg); }
+    .collapsible-body { margin-top: 12px; }
+    .collapsible-body.hidden { display: none; }
+
+    /* ===== 页面级 Tab（图片/视频切换）===== */
+    .page-tabs {
+      display: flex;
+      gap: 2px;
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 3px;
+    }
+    .page-tab {
+      padding: 6px 20px;
+      border-radius: 4px;
+      border: none;
+      background: transparent;
+      color: var(--text2);
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: var(--t);
+    }
+    .page-tab:hover { color: var(--text); }
+    .page-tab.active { background: var(--accent); color: #fff; }
+
+    /* 页面区域显示 */
+    .page-section { display: none; }
+    .page-section.active { display: block; }
+
+    /* ===== 视频生成专用样式 ===== */
+    .mode-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 6px;
+      margin-bottom: 4px;
+    }
+    .mode-btn {
+      padding: 8px 6px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+      background: var(--bg);
+      color: var(--text2);
+      font-size: 11px;
+      cursor: pointer;
+      text-align: center;
+      transition: var(--t);
+      line-height: 1.4;
+    }
+    .mode-btn:hover { border-color: var(--accent); color: var(--accent); }
+    .mode-btn.active { background: var(--accent-light); border-color: var(--accent); color: var(--accent); font-weight: 600; }
+
+    /* 视频结果播放器 */
+    .video-result-wrap {
+      position: relative;
+      background: #000;
+      border-radius: var(--radius);
+      overflow: hidden;
+      max-width: 100%;
+    }
+    .video-result-wrap video {
+      width: 100%;
+      display: block;
+      max-height: 60vh;
+    }
+    .video-download-bar {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      padding: 10px;
+      background: var(--bg3);
+      border-top: 1px solid var(--border);
+    }
+    .video-download-bar a {
+      flex: 1;
+      text-align: center;
+      padding: 7px;
+      font-size: 13px;
+      border-radius: 4px;
+      border: 1px solid var(--border);
+      color: var(--text2);
+      text-decoration: none;
+      transition: var(--t);
+    }
+    .video-download-bar a:hover { border-color: var(--accent); color: var(--accent); }
+    .video-meta { font-size: 11px; color: var(--text3); }
+  </style>
+</head>
+<body>
+
+<!-- Header -->
+<header>
+  <div class="container">
+    <div class="header-inner">
+      <div class="logo">
+        <div class="logo-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><polygon points="13,2 3,14 12,14 11,22 21,10 12,10"/></svg>
+        </div>
+        <div>
+          <div class="logo-title">即梦AI 生成 Demo</div>
+          <div class="logo-sub">火山引擎 · 图片 & 视频</div>
+        </div>
+      </div>
+      <div class="page-tabs">
+        <button class="page-tab active" data-page="image" onclick="switchPage('image')">🖼 图片生成</button>
+        <button class="page-tab" data-page="video" onclick="switchPage('video')">🎬 视频生成</button>
+      </div>
+      <div class="config-status">
+        <div class="dot" id="status-dot"></div>
+        <span id="config-text">检查配置中…</span>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- ===== 图片生成页面 ===== -->
+<div class="page-section active" id="page-image">
+<div class="container">
+  <div class="main-grid">
+
+    <!-- 左栏：控制面板 -->
+    <div>
+      <div class="card">
+        <div class="card-title">
+          <svg width="14" height="14" viewBox="0 0 14 14"><path d="M7 1l1.5 3h3L9 6l1 3-3-2-3 2 1-3-2.5-2H5.5z" fill="currentColor"/></svg>
+          生成参数
+        </div>
+
+        <!-- 提示词 -->
+        <div class="form-group">
+          <label class="form-label">提示词 Prompt <span style="color:var(--danger)">*</span></label>
+          <textarea class="form-textarea" id="prompt" placeholder="描述你想要生成的图片内容，支持中英文，最长 800 字符&#10;例：一只橙色的小猫坐在阳光下的窗台边，水彩插画风格" maxlength="800"></textarea>
+          <div class="tip-text"><span id="prompt-count">0</span>/800 字符</div>
+        </div>
+
+        <!-- 图片尺寸 -->
+        <div class="form-group">
+          <label class="form-label">输出尺寸</label>
+          <select class="form-select" id="size">
+            <optgroup label="── 1K ──">
+              <option value="1024x1024">1:1 · 1024×1024</option>
+            </optgroup>
+            <optgroup label="── 2K (推荐) ──">
+              <option value="2048x2048" selected>1:1 · 2048×2048</option>
+              <option value="2304x1728">4:3 · 2304×1728</option>
+              <option value="2560x1440">16:9 · 2560×1440</option>
+              <option value="2496x1664">3:2 · 2496×1664</option>
+              <option value="3024x1296">21:9 · 3024×1296</option>
+              <option value="1728x2304">3:4 · 1728×2304</option>
+              <option value="1440x2560">9:16 · 1440×2560</option>
+            </optgroup>
+            <optgroup label="── 4K ──">
+              <option value="4096x4096">1:1 · 4096×4096</option>
+              <option value="4694x3520">4:3 · 4694×3520</option>
+              <option value="4992x3328">3:2 · 4992×3328</option>
+              <option value="5404x3040">16:9 · 5404×3040</option>
+            </optgroup>
+          </select>
+        </div>
+
+        <!-- 文本影响强度 -->
+        <div class="form-group">
+          <label class="form-label">文本影响强度 Scale <span class="tip-text">（越高提示词控制越强，图生图时越高原图影响越弱）</span></label>
+          <div class="slider-row">
+            <input type="range" class="form-range" id="scale" min="0" max="1" step="0.05" value="0.5"
+              oninput="document.getElementById('scale-val').textContent=parseFloat(this.value).toFixed(2)" />
+            <span class="slider-val" id="scale-val">0.50</span>
+          </div>
+        </div>
+
+        <!-- 随机种子 -->
+        <div class="form-group">
+          <label class="form-label">随机种子 Seed <span class="tip-text">（-1 = 每次随机；固定值可复现结果）</span></label>
+          <input type="number" class="form-input" id="seed" value="-1" min="-1" />
+        </div>
+
+        <hr class="divider" />
+
+        <!-- 参考图 折叠 -->
+        <div>
+          <div class="collapsible-header" onclick="toggleSection('ref-section','ref-icon')">
+            <span class="collapse-icon" id="ref-icon">▶</span>
+            参考图（图生图 / 多图参考）
+          </div>
+          <div class="collapsible-body hidden" id="ref-section">
+            <br/>
+            <!-- URL 输入 -->
+            <div class="form-group">
+              <label class="form-label">图片 URL（可添加多个，最多 10 张）</label>
+              <div class="url-add-row">
+                <input type="text" class="form-input" id="url-input" placeholder="https://example.com/image.jpg" />
+                <button class="btn btn-outline btn-sm" onclick="addUrlTag()">添加</button>
+              </div>
+              <div class="url-tag-list" id="url-tag-list"></div>
+            </div>
+            <div class="tip-text">4.0 支持最多 10 张参考图；图生图时建议 scale 设置为 0.3~0.7</div>
+
+            <hr class="divider" />
+            <!-- 生成数量控制 -->
+            <div class="form-group">
+              <label class="form-label">输出数量控制</label>
+              <div class="form-row">
+                <div>
+                  <label class="form-label">强制生成单图</label>
+                  <select class="form-select" id="force-single">
+                    <option value="false">否（自动判断）</option>
+                    <option value="true">是（强制1张）</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="form-label">最大输出数</label>
+                  <select class="form-select" id="max-ratio">
+                    <option value="1">1张</option>
+                    <option value="3">3张</option>
+                    <option value="6" selected>6张</option>
+                    <option value="9">9张</option>
+                    <option value="15">15张（最大）</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <hr class="divider" />
+
+        <!-- 生成按钮 -->
+        <button class="btn btn-primary" id="btn-generate" onclick="doGenerate()">
+          <svg width="16" height="16" viewBox="0 0 16 16"><polygon points="4,2 13,8 4,14" fill="currentColor"/></svg>
+          <span id="btn-text">开始生成</span>
+        </button>
+
+        <!-- 当前版本信息 -->
+        <div style="margin-top:12px;font-size:11px;color:var(--text3);text-align:center" id="model-info">
+          模型：jimeng_t2i_v40 | 即梦图片生成 4.0
+        </div>
+      </div>
+
+      <!-- 历史记录 -->
+      <div class="card" style="margin-top:16px" id="history-card">
+        <div class="card-title">
+          <svg width="14" height="14" viewBox="0 0 14 14"><circle cx="7" cy="7" r="5.5" stroke="currentColor" stroke-width="1.3" fill="none"/><path d="M7 4v3l2 1.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" fill="none"/></svg>
+          任务历史
+        </div>
+        <div class="history-tabs" id="history-tabs">
+          <div style="font-size:12px;color:var(--text3)">暂无历史</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 右栏：结果 -->
+    <div>
+      <div class="card">
+        <div class="result-header">
+          <div class="card-title" style="margin:0">
+            <svg width="14" height="14" viewBox="0 0 14 14"><rect x="1" y="1" width="12" height="12" rx="2" stroke="currentColor" stroke-width="1.3" fill="none"/><path d="M1 9l3-3 2 2 3-4 4 5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" fill="none"/></svg>
+            生成结果
+          </div>
+          <div class="result-meta" id="result-meta"></div>
+        </div>
+
+        <!-- 状态条 -->
+        <div class="status-bar idle" id="status-bar">
+          <svg width="14" height="14" viewBox="0 0 14 14"><circle cx="7" cy="7" r="5.5" stroke="currentColor" stroke-width="1.3" fill="none"/><path d="M7 4v3l2 1.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" fill="none"/></svg>
+          <span id="status-text">等待生成…</span>
+        </div>
+
+        <!-- 进度条 -->
+        <div class="progress-wrap" id="progress-wrap" style="display:none">
+          <div class="progress-bar" id="progress-bar" style="width:0%"></div>
+        </div>
+
+        <!-- 图片结果 -->
+        <div id="result-area">
+          <div class="empty-state">
+            <svg width="64" height="64" viewBox="0 0 64 64" fill="none">
+              <rect x="4" y="12" width="56" height="40" rx="6" stroke="currentColor" stroke-width="2"/>
+              <circle cx="22" cy="28" r="5" stroke="currentColor" stroke-width="1.5"/>
+              <path d="M4 42l14-12 10 10 8-10 14 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+            <div style="font-size:14px">填写提示词，点击「开始生成」</div>
+            <div style="font-size:12px">支持文生图、图生图、多图参考生成</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</div><!-- /page-image -->
+
+<!-- ===== 视频生成页面 ===== -->
+<div class="page-section" id="page-video">
+<div class="container">
+  <div class="main-grid">
+
+    <!-- 左栏：视频参数 -->
+    <div>
+      <div class="card">
+        <div class="card-title">
+          <svg width="14" height="14" viewBox="0 0 14 14"><path d="M1 2h9v8H1z" stroke="currentColor" stroke-width="1.2" fill="none" rx="1"/><path d="M10 5l3-2v6l-3-2V5z" fill="currentColor"/></svg>
+          视频模型
+        </div>
+        <!-- 模型版本 -->
+        <div class="form-group">
+          <label class="form-label">模型版本</label>
+          <div class="tab-pills" id="video-model-tabs">
+            <button class="tab-pill active" data-vm="pro"   onclick="switchVideoModel('pro')">3.0 Pro<br><span style="font-size:10px;font-weight:400">1080P</span></button>
+            <button class="tab-pill"         data-vm="720p"  onclick="switchVideoModel('720p')">3.0 720P</button>
+            <button class="tab-pill"         data-vm="1080p" onclick="switchVideoModel('1080p')">3.0 1080P</button>
+          </div>
+        </div>
+        <!-- 生成模式 -->
+        <div class="form-group">
+          <label class="form-label">生成模式</label>
+          <div class="mode-grid" id="video-mode-grid">
+            <button class="mode-btn active" data-mode="t2v"        onclick="switchVideoMode('t2v')">📝 文生视频</button>
+            <button class="mode-btn"        data-mode="i2v_first"  onclick="switchVideoMode('i2v_first')">🖼 图生视频（首帧）</button>
+            <button class="mode-btn"        data-mode="i2v_tail"   onclick="switchVideoMode('i2v_tail')">🖼🖼 首帧+尾帧</button>
+            <button class="mode-btn"        data-mode="i2v_camera" onclick="switchVideoMode('i2v_camera')" id="mode-camera">📷 运镜（仅720P）</button>
+          </div>
+        </div>
+        <div class="form-group">
+          <div id="video-model-info" style="font-size:11px;color:var(--text3);padding:6px 8px;background:var(--bg3);border-radius:4px;border:1px solid var(--border)">
+            req_key: jimeng_ti2v_v30_pro
+          </div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:16px">
+        <div class="card-title">
+          <svg width="14" height="14" viewBox="0 0 14 14"><path d="M7 1l1.5 3h3L9 6l1 3-3-2-3 2 1-3-2.5-2H5.5z" fill="currentColor"/></svg>
+          生成参数
+        </div>
+
+        <!-- 提示词 -->
+        <div class="form-group">
+          <label class="form-label">提示词 <span style="color:var(--danger)">*</span></label>
+          <textarea class="form-textarea" id="v-prompt"
+            placeholder="描述视频内容，建议 400 字以内，上限 800 字&#10;例：千军万马奔腾在草原上，阳光明媚，高清画质"
+            maxlength="800" style="min-height:90px"
+            oninput="document.getElementById('v-prompt-count').textContent=this.value.length"></textarea>
+          <div class="tip-text"><span id="v-prompt-count">0</span>/800 字符</div>
+        </div>
+
+        <!-- 视频时长 -->
+        <div class="form-group">
+          <label class="form-label">视频时长</label>
+          <div class="tab-pills">
+            <button class="tab-pill active" data-dur="121" onclick="selectDuration(this,121)">5 秒（121帧）</button>
+            <button class="tab-pill"        data-dur="241" onclick="selectDuration(this,241)">10 秒（241帧）</button>
+          </div>
+        </div>
+
+        <!-- 宽高比 -->
+        <div class="form-group">
+          <label class="form-label">画面比例</label>
+          <select class="form-select" id="v-aspect">
+            <option value="16:9" selected>横屏 16:9</option>
+            <option value="9:16">竖屏 9:16</option>
+            <option value="1:1">方形 1:1</option>
+            <option value="4:3">4:3</option>
+            <option value="3:4">3:4</option>
+            <option value="21:9">宽屏 21:9</option>
+          </select>
+        </div>
+
+        <!-- 随机种子 -->
+        <div class="form-group">
+          <label class="form-label">随机种子（-1=随机）</label>
+          <input type="number" class="form-input" id="v-seed" value="-1" min="-1" />
+        </div>
+
+        <hr class="divider" />
+
+        <!-- 图生视频参考图 -->
+        <div id="v-image-section">
+          <div class="collapsible-header" onclick="toggleSection('v-img-body','v-img-icon')">
+            <span class="collapse-icon open" id="v-img-icon">▶</span>
+            参考图片（图生视频必填）
+          </div>
+          <div class="collapsible-body" id="v-img-body">
+            <br/>
+            <div class="form-group">
+              <label class="form-label" id="v-img-label">首帧图片 URL</label>
+              <div class="url-add-row">
+                <input type="text" class="form-input" id="v-url-input" placeholder="https://example.com/frame.jpg" />
+                <button class="btn btn-outline btn-sm" onclick="addVideoUrl()">添加</button>
+              </div>
+              <div class="url-tag-list" id="v-url-tag-list"></div>
+              <div class="tip-text" id="v-img-tip">图片要求：JPEG/PNG，最短边≥320px，比例≤3:1，最大4096×4096</div>
+            </div>
+          </div>
+        </div>
+
+        <hr class="divider" />
+
+        <button class="btn btn-primary" id="v-btn-generate" onclick="doVideoGenerate()">
+          <svg width="16" height="16" viewBox="0 0 16 16"><polygon points="4,2 13,8 4,14" fill="currentColor"/></svg>
+          <span id="v-btn-text">开始生成视频</span>
+        </button>
+      </div>
+
+      <!-- 历史 -->
+      <div class="card" style="margin-top:16px">
+        <div class="card-title">
+          <svg width="14" height="14" viewBox="0 0 14 14"><circle cx="7" cy="7" r="5.5" stroke="currentColor" stroke-width="1.3" fill="none"/><path d="M7 4v3l2 1.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" fill="none"/></svg>
+          视频历史
+        </div>
+        <div class="history-tabs" id="v-history-tabs">
+          <div style="font-size:12px;color:var(--text3)">暂无历史</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 右栏：视频结果 -->
+    <div>
+      <div class="card">
+        <div class="result-header">
+          <div class="card-title" style="margin:0">
+            <svg width="14" height="14" viewBox="0 0 14 14"><path d="M1 2h9v8H1z" stroke="currentColor" stroke-width="1.2" fill="none" rx="1"/><path d="M10 5l3-2v6l-3-2V5z" fill="currentColor"/></svg>
+            视频结果
+          </div>
+          <div class="result-meta" id="v-result-meta"></div>
+        </div>
+
+        <!-- 状态条 -->
+        <div class="status-bar idle" id="v-status-bar">
+          <svg width="14" height="14" viewBox="0 0 14 14"><circle cx="7" cy="7" r="5.5" stroke="currentColor" stroke-width="1.3" fill="none"/></svg>
+          <span id="v-status-text">等待生成…</span>
+        </div>
+
+        <!-- 进度条 -->
+        <div class="progress-wrap" id="v-progress-wrap" style="display:none">
+          <div class="progress-bar" id="v-progress-bar" style="width:0%"></div>
+        </div>
+
+        <!-- 视频播放区 -->
+        <div id="v-result-area">
+          <div class="empty-state">
+            <svg width="64" height="64" viewBox="0 0 64 64" fill="none">
+              <rect x="4" y="10" width="48" height="36" rx="5" stroke="currentColor" stroke-width="2"/>
+              <polygon points="28,22 44,28 28,34" fill="currentColor" opacity="0.4"/>
+              <rect x="4" y="52" width="10" height="4" rx="1" fill="currentColor" opacity="0.3"/>
+              <rect x="16" y="52" width="16" height="4" rx="1" fill="currentColor" opacity="0.3"/>
+            </svg>
+            <div style="font-size:14px">填写参数，点击「开始生成视频」</div>
+            <div style="font-size:12px;color:var(--text3)">支持文生视频、图生视频（首帧/首尾帧/运镜）</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 参数说明卡片 -->
+      <div class="card" style="margin-top:16px">
+        <div class="card-title">
+          <svg width="14" height="14" viewBox="0 0 14 14"><circle cx="7" cy="7" r="5.5" stroke="currentColor" stroke-width="1.3" fill="none"/><path d="M7 6.5v4M7 4.5v1" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" fill="none"/></svg>
+          模型说明
+        </div>
+        <div style="font-size:12px;color:var(--text2);line-height:1.8">
+          <div><b style="color:var(--accent)">3.0 Pro</b>：1080P高清，多镜头叙事，文生/图生共用同一接口</div>
+          <div><b style="color:var(--accent)">3.0 720P</b>：支持运镜功能，有首帧/首尾帧/运镜三种图生模式</div>
+          <div><b style="color:var(--accent)">3.0 1080P</b>：1080P，仅支持首帧和首尾帧图生模式</div>
+          <hr style="border-color:var(--border);margin:8px 0"/>
+          <div>⏱ <b>视频生成通常需要 1~5 分钟</b>，请耐心等待</div>
+          <div>🖼 图生视频：首帧传1张，首尾帧传2张（首帧+末帧），运镜传1张</div>
+          <div>📐 帧数：5秒=121帧，10秒=241帧（公式：秒数×24+1）</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+</div><!-- /page-video -->
+
+<!-- 灯箱 -->
+<div class="lightbox" id="lightbox" onclick="closeLightbox()">
+  <button class="lightbox-close" onclick="closeLightbox()">✕</button>
+  <img id="lightbox-img" src="" alt="" />
+</div>
+
+<!-- Toast -->
+<div class="toast-wrap" id="toast-wrap"></div>
+
+<script>
+  // ===== 状态 =====
+  let currentVersion = '4.0';
+  let currentTaskId = null;
+  let currentReqKey = 'jimeng_t2i_v40';
+  let pollTimer = null;
+  let pollCount = 0;
+  const MAX_POLL = 60;  // 最多轮询 60 次（约 2 分钟）
+  let history = [];     // [{taskId, reqKey, prompt, images, time}]
+  let urlList = [];
+
+  const MODEL_INFO = {
+    '4.0': { reqKey: 'jimeng_t2i_v40', desc: '即梦图片生成 4.0' },
+    '4.6': { reqKey: 'jimeng_t2i_v46', desc: '即梦图片生成 4.6' },
+  };
+
+  // ===== 初始化 =====
+  window.addEventListener('load', () => {
+    checkConfig();
+    document.getElementById('prompt').addEventListener('input', function() {
+      document.getElementById('prompt-count').textContent = this.value.length;
+    });
+    document.getElementById('url-input').addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') { e.preventDefault(); addUrlTag(); }
+    });
+  });
+
+  // ===== 配置检查 =====
+  async function checkConfig() {
+    try {
+      const r = await fetch('/api/config');
+      const data = await r.json();
+      const dot = document.getElementById('status-dot');
+      const txt = document.getElementById('config-text');
+      if (data.ak_configured && data.sk_configured) {
+        dot.classList.add('ok');
+        txt.textContent = 'AK/SK 已配置';
+      } else {
+        txt.textContent = '未配置 AK/SK（请创建 .env 文件）';
+      }
+    } catch {}
+  }
+
+  // ===== 版本切换 =====
+  function switchVersion(v) {
+    currentVersion = v;
+    document.querySelectorAll('.version-tab').forEach(t => t.classList.toggle('active', t.dataset.v === v));
+    const info = MODEL_INFO[v];
+    currentReqKey = info.reqKey;
+    document.getElementById('model-info').textContent = `模型：${info.reqKey} | ${info.desc}`;
+    toast(`切换到即梦 ${v}`, 'info');
+  }
+
+  // ===== URL 标签管理 =====
+  function addUrlTag() {
+    const input = document.getElementById('url-input');
+    const url = input.value.trim();
+    if (!url) return;
+    if (urlList.length >= 10) { toast('最多添加 10 张参考图', 'error'); return; }
+    if (!url.startsWith('http')) { toast('请输入有效的 HTTP/HTTPS URL', 'error'); return; }
+    urlList.push(url);
+    input.value = '';
+    renderUrlTags();
+  }
+
+  function removeUrl(idx) {
+    urlList.splice(idx, 1);
+    renderUrlTags();
+  }
+
+  function renderUrlTags() {
+    const c = document.getElementById('url-tag-list');
+    c.innerHTML = urlList.map((u, i) => `
+      <div class="url-tag">
+        <span title="${u}">${u.split('/').pop() || u.substring(0, 30)}</span>
+        <button onclick="removeUrl(${i})" title="移除">×</button>
+      </div>
+    `).join('');
+  }
+
+  // ===== 折叠 =====
+  function toggleSection(bodyId, iconId) {
+    const body = document.getElementById(bodyId);
+    const icon = document.getElementById(iconId);
+    const hidden = body.classList.toggle('hidden');
+    icon.classList.toggle('open', !hidden);
+  }
+
+  // ===== 生成 =====
+  async function doGenerate() {
+    const prompt = document.getElementById('prompt').value.trim();
+    if (!prompt) { toast('请输入提示词', 'error'); return; }
+
+    const params = {
+      version: currentVersion,
+      prompt,
+      size: document.getElementById('size').value,
+      scale: parseFloat(document.getElementById('scale').value),
+      seed: parseInt(document.getElementById('seed').value) || -1,
+      image_urls: [...urlList],
+      force_single: document.getElementById('force-single').value === 'true',
+    };
+
+    setGenerating(true);
+    setStatus('loading', '提交任务中…');
+    showProgress(5);
+    clearResults();
+
+    try {
+      const r = await fetch('/api/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(params),
+      });
+      const data = await r.json();
+      if (!r.ok || data.error) {
+        const hint = data.hint ? `\n提示：${data.hint}` : '';
+        throw new Error((data.error || '提交失败') + hint);
+      }
+      currentTaskId = data.task_id;
+      currentReqKey = data.req_key;
+      setStatus('loading', `任务已提交，正在生成… (task: ${currentTaskId.substring(0, 12)}…)`);
+      showProgress(15);
+      startPolling();
+    } catch (e) {
+      setStatus('error', `错误：${e.message}`);
+      setGenerating(false);
+      hideProgress();
+      toast(e.message, 'error');
+    }
+  }
+
+  // ===== 轮询 =====
+  function startPolling() {
+    pollCount = 0;
+    pollTimer = setInterval(pollResult, 2000);
+  }
+
+  async function pollResult() {
+    if (!currentTaskId) return;
+    pollCount++;
+    const progress = Math.min(15 + pollCount * 1.2, 92);
+    showProgress(progress);
+
+    if (pollCount > MAX_POLL) {
+      clearInterval(pollTimer);
+      setStatus('error', '生成超时，请重试');
+      setGenerating(false);
+      hideProgress();
+      toast('生成超时', 'error');
+      return;
+    }
+
+    try {
+      const r = await fetch('/api/query', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ task_id: currentTaskId, req_key: currentReqKey }),
+      });
+      const data = await r.json();
+
+      if (data.error) throw new Error(data.error);
+
+      if (data.status === 'done') {
+        clearInterval(pollTimer);
+        showProgress(100);
+        setTimeout(hideProgress, 600);
+        renderImages(data.images || []);
+        const elapsed = (pollCount * 2).toFixed(0);
+        setStatus('success', `生成完成！共 ${data.images.length} 张图片（耗时约 ${elapsed}s）`);
+        setGenerating(false);
+        addHistory(currentTaskId, currentReqKey, document.getElementById('prompt').value.trim(), data.images);
+        document.getElementById('result-meta').textContent =
+          `版本: ${currentVersion} · ${data.images.length}张 · ~${elapsed}s`;
+        toast(`生成完成，共 ${data.images.length} 张`, 'success');
+      } else {
+        setStatus('loading', `生成中… (${pollCount * 2}s)`);
+      }
+    } catch (e) {
+      clearInterval(pollTimer);
+      setStatus('error', `查询失败：${e.message}`);
+      setGenerating(false);
+      hideProgress();
+      toast(`查询失败：${e.message}`, 'error');
+    }
+  }
+
+  // ===== 渲染图片 =====
+  function renderImages(images) {
+    if (!images.length) {
+      document.getElementById('result-area').innerHTML =
+        '<div style="color:var(--text3);padding:20px;text-align:center">未返回图片数据</div>';
+      return;
+    }
+    const html = `<div class="images-grid">${images.map((img, i) => {
+      const src = img.type === 'url' ? img.data : `data:image/png;base64,${img.data}`;
+      const downloadHref = img.type === 'url' ? img.data : src;
+      return `
+        <div class="image-card">
+          <img src="${src}" alt="生成图片${i+1}" loading="lazy" onclick="openLightbox('${src}')" />
+          <div class="image-actions">
+            <a href="${downloadHref}" download="jimeng_${Date.now()}_${i+1}.png" target="_blank">
+              ⬇ 下载
+            </a>
+            <button onclick="openLightbox('${src}')">🔍 预览</button>
+          </div>
+        </div>`;
+    }).join('')}</div>`;
+    document.getElementById('result-area').innerHTML = html;
+  }
+
+  function clearResults() {
+    document.getElementById('result-area').innerHTML = '';
+    document.getElementById('result-meta').textContent = '';
+  }
+
+  // ===== 状态与进度 =====
+  function setStatus(type, text) {
+    const bar = document.getElementById('status-bar');
+    bar.className = `status-bar ${type}`;
+    const icons = {
+      idle: '<svg width="14" height="14" viewBox="0 0 14 14"><circle cx="7" cy="7" r="5.5" stroke="currentColor" stroke-width="1.3" fill="none"/></svg>',
+      loading: '<div class="spinner"></div>',
+      success: '<svg width="14" height="14" viewBox="0 0 14 14"><circle cx="7" cy="7" r="5.5" stroke="currentColor" stroke-width="1.3" fill="none"/><path d="M4 7l2 2 4-4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" fill="none"/></svg>',
+      error: '<svg width="14" height="14" viewBox="0 0 14 14"><circle cx="7" cy="7" r="5.5" stroke="currentColor" stroke-width="1.3" fill="none"/><path d="M7 4v4M7 9.5v.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" fill="none"/></svg>',
+    };
+    bar.innerHTML = `${icons[type] || ''}<span>${text}</span>`;
+  }
+
+  function setGenerating(loading) {
+    const btn = document.getElementById('btn-generate');
+    const txt = document.getElementById('btn-text');
+    btn.disabled = loading;
+    txt.textContent = loading ? '生成中…' : '开始生成';
+  }
+
+  function showProgress(pct) {
+    document.getElementById('progress-wrap').style.display = '';
+    document.getElementById('progress-bar').style.width = `${pct}%`;
+  }
+
+  function hideProgress() {
+    document.getElementById('progress-wrap').style.display = 'none';
+    document.getElementById('progress-bar').style.width = '0%';
+  }
+
+  // ===== 历史 =====
+  function addHistory(taskId, reqKey, prompt, images) {
+    history.unshift({ taskId, reqKey, prompt, images, time: new Date().toLocaleTimeString() });
+    if (history.length > 10) history.pop();
+    renderHistory();
+  }
+
+  function renderHistory() {
+    const c = document.getElementById('history-tabs');
+    if (!history.length) {
+      c.innerHTML = '<div style="font-size:12px;color:var(--text3)">暂无历史</div>';
+      return;
+    }
+    c.innerHTML = history.map((h, i) => `
+      <div class="history-badge" onclick="loadHistory(${i})" title="${h.prompt}">
+        ${h.time} · ${h.prompt.substring(0, 16)}${h.prompt.length > 16 ? '…' : ''}
+      </div>
+    `).join('');
+  }
+
+  function loadHistory(i) {
+    const h = history[i];
+    if (!h) return;
+    renderImages(h.images);
+    setStatus('success', `历史结果：${h.prompt.substring(0, 30)}`);
+    document.getElementById('result-meta').textContent = `版本: ${h.reqKey} · ${h.images.length}张`;
+  }
+
+  // ===== 灯箱 =====
+  function openLightbox(src) {
+    document.getElementById('lightbox-img').src = src;
+    document.getElementById('lightbox').classList.add('open');
+  }
+  function closeLightbox() {
+    document.getElementById('lightbox').classList.remove('open');
+  }
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') closeLightbox();
+  });
+
+  // ===== Toast =====
+  function toast(msg, type = 'info') {
+    const c = document.getElementById('toast-wrap');
+    const el = document.createElement('div');
+    el.className = `toast ${type}`;
+    el.textContent = msg;
+    c.appendChild(el);
+    setTimeout(() => {
+      el.style.animation = 'toastIn 0.2s ease reverse';
+      setTimeout(() => el.remove(), 200);
+    }, 3500);
+  }
+
+  // ===== 页面级切换（图片 / 视频）=====
+  function switchPage(page) {
+    document.querySelectorAll('.page-tab').forEach(b => b.classList.toggle('active', b.dataset.page === page));
+    document.querySelectorAll('.page-section').forEach(s => s.classList.toggle('active', s.id === 'page-' + page));
+  }
+
+  // ===== 视频生成状态 =====
+  const vState = {
+    model: 'pro',
+    mode: 't2v',
+    frames: 121,
+    urlList: [],
+    taskId: null,
+    reqKey: 'jimeng_ti2v_v30_pro',
+    pollTimer: null,
+    pollCount: 0,
+    history: [],
+  };
+
+  const VIDEO_REQ_KEY = {
+    pro:   { t2v: 'jimeng_ti2v_v30_pro',     i2v_first: 'jimeng_ti2v_v30_pro',        i2v_tail: 'jimeng_ti2v_v30_pro' },
+    '720p':{ t2v: 'jimeng_t2v_v30',          i2v_first: 'jimeng_i2v_first_v30',       i2v_tail: 'jimeng_i2v_first_tail_v30',  i2v_camera: 'jimeng_i2v_recamera_v30' },
+    '1080p':{ t2v: 'jimeng_t2v_v30_1080p',   i2v_first: 'jimeng_i2v_first_v30_1080', i2v_tail: 'jimeng_i2v_first_tail_v30_1080' },
+  };
+
+  function switchVideoModel(m) {
+    vState.model = m;
+    document.querySelectorAll('[data-vm]').forEach(b => b.classList.toggle('active', b.dataset.vm === m));
+    // 运镜按钮仅 720p 可用
+    const camBtn = document.getElementById('mode-camera');
+    camBtn.disabled = m !== '720p';
+    camBtn.style.opacity = m !== '720p' ? '0.4' : '1';
+    // 若当前 mode 在新 model 下不支持则切回 t2v
+    if (!VIDEO_REQ_KEY[m][vState.mode]) switchVideoMode('t2v');
+    else updateVideoReqKeyInfo();
+  }
+
+  function switchVideoMode(mode) {
+    // 运镜仅 720p
+    if (mode === 'i2v_camera' && vState.model !== '720p') {
+      toast('运镜模式仅 3.0 720P 支持', 'error'); return;
+    }
+    vState.mode = mode;
+    document.querySelectorAll('[data-mode]').forEach(b => b.classList.toggle('active', b.dataset.mode === mode));
+    // 更新图片区提示文字
+    const isT2V = mode === 't2v';
+    document.getElementById('v-image-section').style.opacity = isT2V ? '0.5' : '1';
+    document.getElementById('v-image-section').style.pointerEvents = isT2V ? 'none' : '';
+    const labelMap = {
+      i2v_first:  '首帧图片 URL（必填，1张）',
+      i2v_tail:   '首帧 + 尾帧 URL（必填，2张：第1张=首帧，第2张=尾帧）',
+      i2v_camera: '参考图片 URL（必填，1张）',
+    };
+    document.getElementById('v-img-label').textContent = labelMap[mode] || '参考图片 URL';
+    updateVideoReqKeyInfo();
+  }
+
+  function updateVideoReqKeyInfo() {
+    const rk = VIDEO_REQ_KEY[vState.model]?.[vState.mode] || '—';
+    document.getElementById('video-model-info').textContent = `req_key: ${rk}`;
+    vState.reqKey = rk;
+  }
+
+  function selectDuration(btn, frames) {
+    vState.frames = frames;
+    document.querySelectorAll('[data-dur]').forEach(b => b.classList.toggle('active', parseInt(b.dataset.dur) === frames));
+  }
+
+  // ===== 视频参考图 URL =====
+  function addVideoUrl() {
+    const input = document.getElementById('v-url-input');
+    const url = input.value.trim();
+    if (!url) return;
+    const maxUrls = vState.mode === 'i2v_tail' ? 2 : 1;
+    if (vState.urlList.length >= maxUrls) { toast(`最多添加 ${maxUrls} 张参考图`, 'error'); return; }
+    if (!url.startsWith('http')) { toast('请输入有效的 HTTP/HTTPS URL', 'error'); return; }
+    vState.urlList.push(url);
+    input.value = '';
+    renderVideoUrlTags();
+  }
+
+  function removeVideoUrl(i) {
+    vState.urlList.splice(i, 1);
+    renderVideoUrlTags();
+  }
+
+  function renderVideoUrlTags() {
+    const c = document.getElementById('v-url-tag-list');
+    c.innerHTML = vState.urlList.map((u, i) => `
+      <div class="url-tag">
+        <span title="${u}">${u.split('/').pop() || u.substring(0, 30)}</span>
+        <button onclick="removeVideoUrl(${i})">×</button>
+      </div>`).join('');
+  }
+
+  // ===== 视频生成提交 =====
+  async function doVideoGenerate() {
+    const prompt = document.getElementById('v-prompt').value.trim();
+    if (!prompt) { toast('请输入提示词', 'error'); return; }
+    if (vState.mode !== 't2v' && vState.urlList.length === 0) {
+      toast('图生视频模式请添加参考图片 URL', 'error'); return;
+    }
+
+    const body = {
+      model: vState.model,
+      mode: vState.mode,
+      prompt,
+      frames: vState.frames,
+      aspect_ratio: document.getElementById('v-aspect').value,
+      seed: parseInt(document.getElementById('v-seed').value) || -1,
+      image_urls: [...vState.urlList],
+    };
+
+    vSetGenerating(true);
+    vSetStatus('loading', '提交任务中…');
+    vShowProgress(5);
+    document.getElementById('v-result-area').innerHTML = '';
+
+    try {
+      const r = await fetch('/api/video/generate', {
+        method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(body),
+      });
+      const data = await r.json();
+      if (!r.ok || data.error) throw new Error(data.error + (data.hint ? '\n' + data.hint : ''));
+
+      vState.taskId = data.task_id;
+      vState.reqKey = data.req_key;
+      vSetStatus('loading', `任务已提交，生成中… (task: ${vState.taskId.substring(0, 14)}…)`);
+      vShowProgress(10);
+      vStartPolling();
+    } catch (e) {
+      vSetStatus('error', `错误：${e.message}`);
+      vSetGenerating(false);
+      vHideProgress();
+      toast(e.message, 'error');
+    }
+  }
+
+  // ===== 视频轮询 =====
+  const V_MAX_POLL = 180; // 最多 6 分钟（每 2s 一次）
+
+  function vStartPolling() {
+    vState.pollCount = 0;
+    vState.pollTimer = setInterval(vPollResult, 2000);
+  }
+
+  async function vPollResult() {
+    vState.pollCount++;
+    const prog = Math.min(10 + vState.pollCount * 0.4, 90);
+    vShowProgress(prog);
+    const elapsed = vState.pollCount * 2;
+    vSetStatus('loading', `生成中… (已等待 ${elapsed}s，视频通常需要 1~5 分钟)`);
+
+    if (vState.pollCount > V_MAX_POLL) {
+      clearInterval(vState.pollTimer);
+      vSetStatus('error', '生成超时（已等待超过 6 分钟），请重试');
+      vSetGenerating(false);
+      vHideProgress();
+      toast('视频生成超时', 'error');
+      return;
+    }
+
+    try {
+      const r = await fetch('/api/video/query', {
+        method: 'POST', headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({ task_id: vState.taskId, req_key: vState.reqKey }),
+      });
+      const data = await r.json();
+      if (data.error) throw new Error(data.error);
+
+      if (data.status === 'done' && data.video_url) {
+        clearInterval(vState.pollTimer);
+        vShowProgress(100);
+        setTimeout(vHideProgress, 600);
+        renderVideoResult(data.video_url);
+        vSetStatus('success', `视频生成完成！（耗时约 ${elapsed}s）`);
+        vSetGenerating(false);
+        const prompt = document.getElementById('v-prompt').value.trim();
+        vAddHistory(vState.taskId, prompt, data.video_url);
+        document.getElementById('v-result-meta').textContent =
+          `${vState.model.toUpperCase()} · ${vState.mode} · ~${elapsed}s`;
+        toast('视频生成完成！', 'success');
+      } else if (data.status === 'failed') {
+        clearInterval(vState.pollTimer);
+        vSetStatus('error', '视频生成失败，请检查参数后重试');
+        vSetGenerating(false);
+        vHideProgress();
+        toast('视频生成失败', 'error');
+      }
+      // pending 继续等待
+    } catch (e) {
+      clearInterval(vState.pollTimer);
+      vSetStatus('error', `查询失败：${e.message}`);
+      vSetGenerating(false);
+      vHideProgress();
+      toast(`查询失败：${e.message}`, 'error');
+    }
+  }
+
+  // ===== 渲染视频结果 =====
+  function renderVideoResult(videoUrl) {
+    document.getElementById('v-result-area').innerHTML = `
+      <div class="video-result-wrap">
+        <video controls autoplay muted loop playsinline>
+          <source src="${videoUrl}" type="video/mp4" />
+          您的浏览器不支持 video 标签
+        </video>
+        <div class="video-download-bar">
+          <a href="${videoUrl}" download="jimeng_video_${Date.now()}.mp4" target="_blank">⬇ 下载视频</a>
+          <a href="${videoUrl}" target="_blank">🔗 在新标签打开</a>
+          <span class="video-meta">${videoUrl.split('/').pop()?.substring(0, 30) || 'video.mp4'}</span>
+        </div>
+      </div>`;
+  }
+
+  // ===== 视频历史 =====
+  function vAddHistory(taskId, prompt, videoUrl) {
+    vState.history.unshift({ taskId, prompt, videoUrl, time: new Date().toLocaleTimeString() });
+    if (vState.history.length > 8) vState.history.pop();
+    vRenderHistory();
+  }
+
+  function vRenderHistory() {
+    const c = document.getElementById('v-history-tabs');
+    if (!vState.history.length) { c.innerHTML = '<div style="font-size:12px;color:var(--text3)">暂无历史</div>'; return; }
+    c.innerHTML = vState.history.map((h, i) => `
+      <div class="history-badge" onclick="vLoadHistory(${i})" title="${h.prompt}">
+        ${h.time} · ${h.prompt.substring(0,16)}${h.prompt.length>16?'…':''}
+      </div>`).join('');
+  }
+
+  function vLoadHistory(i) {
+    const h = vState.history[i];
+    if (!h) return;
+    renderVideoResult(h.videoUrl);
+    vSetStatus('success', `历史：${h.prompt.substring(0,30)}`);
+  }
+
+  // ===== 视频状态/进度工具 =====
+  function vSetStatus(type, text) {
+    const bar = document.getElementById('v-status-bar');
+    bar.className = `status-bar ${type}`;
+    const icons = {
+      idle:'<svg width="14" height="14" viewBox="0 0 14 14"><circle cx="7" cy="7" r="5.5" stroke="currentColor" stroke-width="1.3" fill="none"/></svg>',
+      loading:'<div class="spinner"></div>',
+      success:'<svg width="14" height="14" viewBox="0 0 14 14"><circle cx="7" cy="7" r="5.5" stroke="currentColor" stroke-width="1.3" fill="none"/><path d="M4 7l2 2 4-4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" fill="none"/></svg>',
+      error:'<svg width="14" height="14" viewBox="0 0 14 14"><circle cx="7" cy="7" r="5.5" stroke="currentColor" stroke-width="1.3" fill="none"/><path d="M7 4v4M7 9.5v.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" fill="none"/></svg>',
+    };
+    bar.innerHTML = `${icons[type]||''}<span>${text}</span>`;
+  }
+
+  function vSetGenerating(on) {
+    const btn = document.getElementById('v-btn-generate');
+    const txt = document.getElementById('v-btn-text');
+    btn.disabled = on;
+    txt.textContent = on ? '生成中…' : '开始生成视频';
+  }
+
+  function vShowProgress(pct) {
+    document.getElementById('v-progress-wrap').style.display = '';
+    document.getElementById('v-progress-bar').style.width = `${pct}%`;
+  }
+
+  function vHideProgress() {
+    document.getElementById('v-progress-wrap').style.display = 'none';
+    document.getElementById('v-progress-bar').style.width = '0%';
+  }
+
+  // ===== 视频页面初始化 =====
+  document.addEventListener('DOMContentLoaded', () => {
+    switchVideoMode('t2v');
+    updateVideoReqKeyInfo();
+    document.getElementById('v-url-input').addEventListener('keydown', e => {
+      if (e.key === 'Enter') { e.preventDefault(); addVideoUrl(); }
+    });
+  });
+</script>
+</body>
+</html>

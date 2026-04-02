@@ -1,0 +1,4 @@
+1、安装node.js, 在dos命令窗口输入命令：node https.js，启动web服务器，然后在chrome80+浏览器访问https://localhost:9091/demo.html打开demo进行测试
+2、安装node.js, 在dos命令窗口输入命令：node http.js，启动web服务器，然后在chrome80+浏览器访问http://localhost:9000/demo.html打开demo进行测试
+3、双击启动webs.exe，然后在chrome80+浏览器访问http://localhost/demo.html打开demo进行测试
+说明:node.js的下载路径：https://nodejs.org/zh-cn/download
